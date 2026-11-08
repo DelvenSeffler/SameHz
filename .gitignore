@@ -1,0 +1,7 @@
+node_modules/
+.npm-cache/
+.chrome-test/
+.chrome-test.pid
+test/screenshots/
+*.log
+.DS_Store

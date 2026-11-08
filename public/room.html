@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080807">
+  <meta name="description" content="同频私人同步放映室。两个人，同一部电影，同一秒。">
+  <title>放映室 · 同频</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/room.css">
+</head>
+<body class="room-page">
+  <svg class="icon-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8.2 5.6 19 12 8.2 18.4V5.6Z" fill="currentColor"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="7" y="5.5" width="3.5" height="13" rx="1" fill="currentColor"/><rect x="13.5" y="5.5" width="3.5" height="13" rx="1" fill="currentColor"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4.5 12h14M13 6.5l5.5 5.5L13 17.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M15.5 8.5v-1a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h1" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="m9.7 14.3 4.6-4.6M7.7 16.3l-1 1a3.4 3.4 0 0 1-4.8-4.8l3-3a3.4 3.4 0 0 1 4.8 0M16.3 7.7l1-1a3.4 3.4 0 0 1 4.8 4.8l-3 3a3.4 3.4 0 0 1-4.8 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="17.5" cy="5.8" r="2.4" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="17.5" cy="18.2" r="2.4" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m8.2 10.8 7.1-3.8M8.2 13.2l7.1 3.8" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4.5m0 0L7.5 9M12 4.5 16.5 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 15v3.2A2.3 2.3 0 0 0 6.8 20.5h10.4a2.3 2.3 0 0 0 2.3-2.3V15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-back10" viewBox="0 0 24 24"><path d="M5 8V4.5m0 0h3.5M5 4.5A8 8 0 1 1 4.2 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><text x="8.1" y="15.1" fill="currentColor" font-family="Arial, sans-serif" font-size="6.2" font-weight="700">10</text></symbol>
+    <symbol id="i-forward10" viewBox="0 0 24 24"><path d="M19 8V4.5m0 0h-3.5M19 4.5A8 8 0 1 0 19.8 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><text x="8.1" y="15.1" fill="currentColor" font-family="Arial, sans-serif" font-size="6.2" font-weight="700">10</text></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4.5 9.5v5h3l4 3.2V6.3l-4 3.2h-3Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M15 9a4.5 4.5 0 0 1 0 6M17.7 6.5a8 8 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4.5 9.5v5h3l4 3.2V6.3l-4 3.2h-3Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m15.5 9.5 5 5m0-5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-fullscreen" viewBox="0 0 24 24"><path d="M4.5 9V5.2c0-.4.3-.7.7-.7H9M15 4.5h3.8c.4 0 .7.3.7.7V9M19.5 15v3.8c0 .4-.3.7-.7.7H15M9 19.5H5.2a.7.7 0 0 1-.7-.7V15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 8.5V4.3m0 0h-4.2M20 4.3a8.4 8.4 0 0 0-14.6 2M4 15.5v4.2m0 0h4.2M4 19.7a8.4 8.4 0 0 0 14.6-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M7.2 5v14M16.8 5v14M3 9h4.2M3 15h4.2M16.8 9H21M16.8 15H21" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.2" r="3" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M3.5 19c.5-3.1 2.6-4.8 5.5-4.8s5 1.7 5.5 4.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M15.5 5.7a2.8 2.8 0 0 1 0 5.4M17.2 14.7c2 .5 3.1 2 3.4 4.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9.7 9.2a2.4 2.4 0 1 1 3.5 2.2c-.8.4-1.2 1-1.2 1.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="16.8" r=".9" fill="currentColor"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m8 10 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M12 7v5.4l3.2 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4 21 19.5H3L12 4Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 9.5v4.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="16.8" r=".9" fill="currentColor"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19.5 9A8 8 0 1 0 20 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M19.5 4.5V9H15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <div class="room-ambient" aria-hidden="true">
+    <span class="room-glow glow-left"></span>
+    <span class="room-glow glow-right"></span>
+    <span class="room-grid"></span>
+  </div>
+
+  <header class="room-nav">
+    <a class="brand room-brand" href="/" aria-label="返回同频首页">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="18.5" stroke="currentColor" stroke-opacity=".34"/>
+          <path d="M16.2 13.4 27 20l-10.8 6.6V13.4Z" fill="currentColor"/>
+          <circle cx="20" cy="20" r="13" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="1.5 3.5"/>
+        </svg>
+      </span>
+      <span class="brand-word">
+        <strong>同频</strong>
+        <small>PRIVATE CINEMA</small>
+      </span>
+    </a>
+
+    <div class="room-meta">
+      <span class="room-label">放映室</span>
+      <button class="room-code-chip" id="copy-code-top" type="button" title="复制房间码">
+        <span id="room-code-label">······</span>
+        <svg class="icon"><use href="#i-copy"></use></svg>
+      </button>
+      <span class="room-meta-divider"></span>
+      <span class="room-date" id="room-date">TONIGHT</span>
+    </div>
+
+    <div class="room-nav-actions">
+      <span class="connection-pill is-connecting" id="connection-pill">
+        <i></i>
+        <span id="connection-text">连接中</span>
+      </span>
+      <button class="nav-ghost-button" id="invite-button" type="button">
+        <svg class="icon"><use href="#i-users"></use></svg>
+        <span>邀请 TA</span>
+      </button>
+      <button class="round-icon-button" id="help-button" type="button" aria-label="使用说明">
+        <svg class="icon"><use href="#i-help"></use></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="room-layout">
+    <section class="cinema-stage" aria-label="同步放映区">
+      <div class="stage-frame" id="stage-frame">
+        <video id="player" playsinline preload="metadata"></video>
+
+        <div class="empty-state" id="empty-state">
+          <div class="empty-inner">
+            <div class="empty-reel" aria-hidden="true">
+              <span class="reel-disc"><i></i><i></i><i></i><i></i></span>
+              <span class="reel-strip"></span>
+              <span class="reel-disc reel-small"><i></i><i></i><i></i></span>
+            </div>
+            <p class="stage-kicker">YOUR LOCAL COPY</p>
+            <h1>把今晚的电影<br>放进来。</h1>
+            <p class="empty-copy">选择你设备里的视频文件。它不会被上传，只在这里播放；TA 需要在自己那边打开同一部片。</p>
+            <button class="accent-action" id="pick-button" type="button">
+              <svg class="icon"><use href="#i-upload"></use></svg>
+              <span>选择本地视频</span>
+            </button>
+            <span class="drag-hint">也可以把文件拖到这里</span>
+            <p class="privacy-mini">
+              <svg class="icon"><use href="#i-check"></use></svg>
+              影片只留在你的设备 · 支持 MP4 / WebM / MOV
+            </p>
+          </div>
+          <div class="empty-perf" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <div class="stage-loading is-hidden" id="stage-loading">
+          <span class="loading-ring"></span>
+          <p id="loading-text">正在读取片源…</p>
+          <small>只在本地处理，不会上传</small>
+        </div>
+
+        <div class="screen-topbar">
+          <span class="screen-sync-pill" id="sync-pill"><i></i><span id="sync-pill-text">等待片源</span></span>
+          <div class="screen-top-actions">
+            <span class="peer-indicator" id="peer-indicator"><i></i> 等待 TA</span>
+            <button class="screen-action" id="replace-button" type="button" hidden>
+              <svg class="icon"><use href="#i-refresh"></use></svg>
+              更换片源
+            </button>
+          </div>
+        </div>
+
+        <div class="gesture-card is-hidden" id="gesture-card">
+          <button id="gesture-play" type="button">
+            <span class="gesture-icon"><svg class="icon"><use href="#i-play"></use></svg></span>
+            <span>继续同步播放<small>浏览器需要一次点击才能播放声音</small></span>
+          </button>
+        </div>
+
+        <button class="center-play is-hidden" id="center-play" type="button" aria-label="播放">
+          <svg class="icon"><use href="#i-play"></use></svg>
+        </button>
+
+        <div class="control-shade" aria-hidden="true"></div>
+        <div class="video-controls is-hidden" id="video-controls">
+          <div class="timeline-row">
+            <span class="control-time" id="current-time">00:00</span>
+            <div class="timeline-shell">
+              <div class="timeline-buffer" id="timeline-buffer"></div>
+              <input id="timeline" type="range" min="0" max="1000" step="0.1" value="0" aria-label="播放进度">
+            </div>
+            <span class="control-time" id="total-time">00:00</span>
+          </div>
+          <div class="control-row">
+            <div class="control-group">
+              <button class="control-button play-control" id="play-button" type="button" aria-label="播放">
+                <svg class="icon"><use href="#i-play"></use></svg>
+              </button>
+              <button class="control-button" id="back-button" type="button" aria-label="后退 10 秒">
+                <svg class="icon"><use href="#i-back10"></use></svg>
+              </button>
+              <button class="control-button" id="forward-button" type="button" aria-label="前进 10 秒">
+                <svg class="icon"><use href="#i-forward10"></use></svg>
+              </button>
+              <div class="volume-control">
+                <button class="control-button" id="mute-button" type="button" aria-label="静音">
+                  <svg class="icon"><use href="#i-volume"></use></svg>
+                </button>
+                <input id="volume" type="range" min="0" max="1" step="0.02" value="0.85" aria-label="音量">
+              </div>
+            </div>
+            <div class="control-group control-right">
+              <span class="drift-readout" id="drift-readout">
+                <i></i>
+                <span id="drift-text">等待同步</span>
+              </span>
+              <button class="inline-sync-button" id="inline-sync" type="button">
+                <svg class="icon"><use href="#i-sync"></use></svg>
+                一键同步
+              </button>
+              <button class="control-button" id="fullscreen-button" type="button" aria-label="全屏">
+                <svg class="icon"><use href="#i-fullscreen"></use></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="drop-overlay" id="drop-overlay" aria-hidden="true">
+          <span class="drop-icon"><svg class="icon"><use href="#i-upload"></use></svg></span>
+          <strong>松手，放进今晚的放映室</strong>
+          <span>文件只在本机读取</span>
+        </div>
+
+        <div class="sync-flash is-hidden" id="sync-flash">
+          <svg class="icon"><use href="#i-sync"></use></svg>
+          <span>进度已对齐</span>
+        </div>
+      </div>
+
+      <div class="film-details">
+        <div class="film-details-main">
+          <p class="film-overline">
+            <span id="film-state">尚未选择片源</span>
+            <i></i>
+            <span id="file-size">—</span>
+            <i></i>
+            <span>本地播放</span>
+          </p>
+          <h2 id="film-title">今晚的放映，还差一部电影</h2>
+          <p class="film-subline" id="film-subline">选择影片后，会和 TA 自动核对是否为同一片源。</p>
+        </div>
+        <div class="match-badge" id="match-badge">
+          <span class="match-badge-icon"><svg class="icon"><use href="#i-film"></use></svg></span>
+          <span class="match-badge-copy">
+            <strong id="match-title">等待双方片源</strong>
+            <small id="match-sub">各自打开同一部电影</small>
+          </span>
+          <span class="match-mark" id="match-mark"></span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side-column" aria-label="放映室信息">
+      <section class="side-panel invite-panel">
+        <div class="panel-heading">
+          <h2>只属于你们的房间</h2>
+          <span class="panel-index">01</span>
+        </div>
+        <div class="invite-code-row">
+          <span class="invite-code" id="invite-code">------</span>
+          <button class="copy-icon-button" id="copy-code" type="button" aria-label="复制房间码">
+            <svg class="icon"><use href="#i-copy"></use></svg>
+          </button>
+        </div>
+        <div class="invite-actions">
+          <button class="invite-primary" id="copy-link" type="button">
+            <svg class="icon"><use href="#i-link"></use></svg>
+            复制邀请链接
+          </button>
+          <button class="invite-secondary" id="share-button" type="button" aria-label="分享邀请">
+            <svg class="icon"><use href="#i-share"></use></svg>
+          </button>
+        </div>
+        <p class="panel-hint">把链接发给 TA，输入昵称就能坐到你身边。</p>
+      </section>
+
+      <section class="side-panel people-panel">
+        <div class="panel-heading">
+          <h2>同场的人</h2>
+          <span class="seat-count" id="seat-count">1 / 2</span>
+        </div>
+        <ul class="participant-list" id="participant-list" aria-live="polite"></ul>
+      </section>
+
+      <section class="side-panel sync-control-panel">
+        <div class="panel-heading">
+          <h2>同步校准</h2>
+          <span class="auto-chip" id="auto-chip">自动</span>
+        </div>
+
+        <div class="sync-orbit" aria-hidden="true">
+          <span class="orbit-node node-a"></span>
+          <span class="orbit-line"><i></i></span>
+          <span class="orbit-node node-b"></span>
+          <span class="orbit-center">
+            <strong id="offset-value">—</strong>
+            <small>当前误差</small>
+          </span>
+        </div>
+
+        <div class="sync-data-rows">
+          <div><span>检测频率</span><strong>每 3 秒</strong></div>
+          <div><span>上次校准</span><strong id="last-sync">尚未校准</strong></div>
+        </div>
+
+        <label class="switch-row" for="auto-sync-toggle">
+          <span>自动校准<small>检测到偏差时自动对齐</small></span>
+          <input type="checkbox" id="auto-sync-toggle" checked>
+          <span class="switch-ui" aria-hidden="true"></span>
+        </label>
+
+        <button class="manual-sync-button" id="manual-sync" type="button">
+          <span class="manual-sync-icon"><svg class="icon"><use href="#i-sync"></use></svg></span>
+          <span class="manual-sync-copy">
+            <strong>一键同步进度</strong>
+            <small id="manual-sync-sub">让两个人回到同一秒</small>
+          </span>
+          <span class="manual-sync-arrow"><svg class="icon"><use href="#i-arrow"></use></svg></span>
+        </button>
+        <p class="panel-hint sync-hint">以放映室记录的基准时间为准，双方会同时对齐。</p>
+      </section>
+
+    </aside>
+
+    <section class="side-panel activity-panel">
+      <div class="panel-heading">
+        <h2>放映动态</h2>
+        <span class="live-chip"><i></i>LIVE</span>
+      </div>
+      <ul class="activity-list" id="activity-list" aria-live="polite">
+        <li class="activity-empty">等一束光，等一个人。</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="room-footer">
+    <span>同频 · PRIVATE CINEMA</span>
+    <span class="room-footer-center"><i></i> 只同步进度，不搬运电影</span>
+    <span>ROOM <b id="footer-room-code">------</b></span>
+  </footer>
+
+  <input type="file" id="file-input" accept="video/*,.mkv,.mov,.m4v,.avi" hidden>
+
+  <div class="modal-layer is-hidden" id="entry-overlay">
+    <div class="entry-backdrop" aria-hidden="true"></div>
+    <section class="entry-card" role="dialog" aria-modal="true" aria-labelledby="entry-title">
+      <div class="entry-mark">
+        <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <circle cx="20" cy="20" r="18.5" stroke="currentColor" stroke-opacity=".34"/>
+          <path d="M16.2 13.4 27 20l-10.8 6.6V13.4Z" fill="currentColor"/>
+          <circle cx="20" cy="20" r="13" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="1.5 3.5"/>
+        </svg>
+      </div>
+      <p class="entry-kicker">YOU'RE INVITED · 双人专场</p>
+      <h1 id="entry-title">今晚，一起看场电影。</h1>
+      <p class="entry-copy">你收到了一张私人放映邀请。取一个 TA 熟悉的昵称，坐到同一块银幕前。</p>
+      <div class="entry-room-code">
+        <span>放映室</span>
+        <strong id="entry-room-code">······</strong>
+      </div>
+      <form id="entry-form">
+        <label class="entry-field">
+          <span>你的昵称</span>
+          <input id="entry-name" type="text" maxlength="20" placeholder="例如：小满" autocomplete="nickname" required>
+        </label>
+        <p class="entry-error" id="entry-error" role="alert"></p>
+        <button class="entry-submit" id="entry-submit" type="submit">
+          <span>坐进放映室</span>
+          <svg class="icon"><use href="#i-arrow"></use></svg>
+        </button>
+      </form>
+      <p class="entry-note"><svg class="icon"><use href="#i-check"></use></svg> 无需注册，影片不会被上传</p>
+      <a class="entry-back" href="/">返回首页</a>
+    </section>
+  </div>
+
+  <div class="modal-layer is-hidden" id="invite-modal">
+    <div class="modal-backdrop" data-close-modal="invite-modal" aria-hidden="true"></div>
+    <section class="dialog-card invite-dialog" role="dialog" aria-modal="true" aria-labelledby="invite-title">
+      <button class="dialog-close" type="button" data-close-modal="invite-modal" aria-label="关闭">
+        <svg class="icon"><use href="#i-close"></use></svg>
+      </button>
+      <p class="dialog-kicker">ONE MORE SEAT</p>
+      <h2 id="invite-title">邀请 TA，坐到同一块银幕前。</h2>
+      <p class="dialog-copy">把链接或房间码发给 TA。打开后输入昵称，就能一起开场。</p>
+      <div class="dialog-code-plate">
+        <span>房间码</span>
+        <strong id="dialog-room-code">------</strong>
+      </div>
+      <label class="invite-link-field">
+        <span>邀请链接</span>
+        <div>
+          <input id="invite-link-input" type="text" readonly>
+          <button id="dialog-copy-link" type="button">复制</button>
+        </div>
+      </label>
+      <div class="dialog-actions">
+        <button class="dialog-primary" id="dialog-share" type="button">
+          <svg class="icon"><use href="#i-share"></use></svg>
+          分享邀请
+        </button>
+        <button class="dialog-secondary" id="dialog-copy-code" type="button">
+          <svg class="icon"><use href="#i-copy"></use></svg>
+          复制房间码
+        </button>
+      </div>
+      <p class="dialog-footnote">这间放映室只有两个座位，先到先得。</p>
+    </section>
+  </div>
+
+  <div class="modal-layer is-hidden" id="help-modal">
+    <div class="modal-backdrop" data-close-modal="help-modal" aria-hidden="true"></div>
+    <section class="dialog-card help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-title">
+      <button class="dialog-close" type="button" data-close-modal="help-modal" aria-label="关闭">
+        <svg class="icon"><use href="#i-close"></use></svg>
+      </button>
+      <p class="dialog-kicker">HOW IT WORKS</p>
+      <h2 id="help-title">两个人，同一部电影，同一秒。</h2>
+      <ol class="help-steps">
+        <li><span>01</span><div><strong>各自选择同一部本地视频</strong><p>你们需要在各自设备上准备好同一个文件。影片不会上传或转码。</p></div></li>
+        <li><span>02</span><div><strong>片源自动核对</strong><p>同频会比对文件指纹与时长。确认一致后，同步会更可靠。</p></div></li>
+        <li><span>03</span><div><strong>任意一方操作，双方同步</strong><p>播放、暂停、拖动进度都会实时同步；每 3 秒还会自动检测并校准偏差。</p></div></li>
+      </ol>
+      <div class="help-callout">
+        <svg class="icon"><use href="#i-sync"></use></svg>
+        <p>如果画面不同步，点击「一键同步进度」，两边会同时对齐到基准时间。</p>
+      </div>
+      <button class="dialog-primary help-close-button" type="button" data-close-modal="help-modal">知道了</button>
+    </section>
+  </div>
+
+  <div class="modal-layer is-hidden" id="fatal-overlay">
+    <div class="entry-backdrop" aria-hidden="true"></div>
+    <section class="entry-card fatal-card" role="alertdialog" aria-modal="true" aria-labelledby="fatal-title">
+      <div class="fatal-icon"><svg class="icon"><use href="#i-warn"></use></svg></div>
+      <p class="entry-kicker">SCREENING INTERRUPTED</p>
+      <h1 id="fatal-title">这束光暂时灭了。</h1>
+      <p class="entry-copy" id="fatal-text">放映室可能已经结束，或者链接不完整。</p>
+      <a class="entry-submit fatal-home" href="/">
+        <span>回到首页</span>
+        <svg class="icon"><use href="#i-arrow"></use></svg>
+      </a>
+    </section>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <script src="/js/room.js" defer></script>
+</body>
+</html>
