@@ -7,6 +7,15 @@
     return;
   }
 
+  const t = (key, params) => (window.I18N ? window.I18N.t(key, params) : key);
+  const i18n = window.I18N || {
+    onChange: () => {},
+    getLang: () => 'zh',
+    locale: () => 'zh-CN',
+    formatDate: (date) => `${date.getMonth() + 1} 月 ${date.getDate()} 日`,
+    isEnglish: () => false,
+  };
+
   const ROOM_ID = roomMatch[1].toUpperCase();
   const NAME_KEY = 'tp:name';
   const CLIENT_KEY = 'tp:client-id';
@@ -14,6 +23,7 @@
   const VOLUME_KEY = 'tp:volume';
   const HEARTBEAT_MS = 3000;
   const AUTO_SYNC_THRESHOLD = 0.85;
+  const HLS_CDN = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js';
 
   const $ = (id) => document.getElementById(id);
 
@@ -23,7 +33,14 @@
     emptyState: $('empty-state'),
     fileInput: $('file-input'),
     pickButton: $('pick-button'),
+    urlOpen: $('url-open'),
     replaceButton: $('replace-button'),
+    sourceModal: $('source-modal'),
+    sourceForm: $('source-form'),
+    sourceUrl: $('source-url'),
+    sourceError: $('source-error'),
+    sourceSubmit: $('source-submit'),
+    sourceFile: $('source-file'),
     loading: $('stage-loading'),
     loadingText: $('loading-text'),
     dropOverlay: $('drop-overlay'),
@@ -50,6 +67,7 @@
     inlineSync: $('inline-sync'),
     filmState: $('film-state'),
     fileSize: $('file-size'),
+    sourceMode: $('source-mode'),
     filmTitle: $('film-title'),
     filmSubline: $('film-subline'),
     matchBadge: $('match-badge'),
@@ -115,6 +133,9 @@
     hasVideo: false,
     file: null,
     fileUrl: null,
+    sourceKind: 'local',
+    sourceUrl: '',
+    peerSourceAttempted: '',
     fingerprint: '',
     fileDuration: 0,
     videoWidth: 0,
@@ -144,6 +165,8 @@
     manualResetTimer: null,
     syncFlashTimer: null,
     toastTimers: new Set(),
+    activityItems: [],
+    hls: null,
   };
 
   const roomUrl = `${location.origin}/room/${ROOM_ID}`;
@@ -194,9 +217,7 @@
   }
 
   function formatRoomDate() {
-    const date = new Date();
-    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    return `${String(date.getMonth() + 1).padStart(2, '0')} 月 ${String(date.getDate()).padStart(2, '0')} 日 · ${weekdays[date.getDay()]}`;
+    return i18n.formatDate(new Date());
   }
 
   function formatTime(seconds) {
@@ -210,13 +231,13 @@
   }
 
   function formatDurationShort(seconds) {
-    if (!Number.isFinite(seconds) || seconds <= 0) return '时长未知';
+    if (!Number.isFinite(seconds) || seconds <= 0) return t('时长未知');
     const total = Math.round(seconds);
     const h = Math.floor(total / 3600);
     const m = Math.round((total % 3600) / 60);
-    if (h > 0) return `${h} 小时 ${m} 分`;
-    if (m > 0) return `${m} 分钟`;
-    return `${total} 秒`;
+    if (h > 0) return t('{hours} 小时 {minutes} 分', { hours: h, minutes: m });
+    if (m > 0) return t('{minutes} 分钟', { minutes: m });
+    return t('{seconds} 秒', { seconds: total });
   }
 
   function formatBytes(bytes) {
@@ -228,8 +249,8 @@
   }
 
   function formatClock(timestamp) {
-    if (!timestamp) return '尚未校准';
-    return new Date(timestamp).toLocaleTimeString('zh-CN', {
+    if (!timestamp) return t('尚未校准');
+    return new Date(timestamp).toLocaleTimeString(i18n.locale(), {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
@@ -292,29 +313,51 @@
     state.toastTimers.add(timer);
   }
 
-  function addActivity(text, tone = 'neutral') {
-    if (!text) return;
-    const empty = dom.activityList.querySelector('.activity-empty');
-    if (empty) empty.remove();
-    const item = document.createElement('li');
-    item.className = `activity-item is-${tone}`;
-    const dot = document.createElement('span');
-    dot.className = 'activity-dot';
-    const paragraph = document.createElement('p');
-    paragraph.textContent = text;
-    const time = document.createElement('time');
-    time.textContent = new Date().toLocaleTimeString('zh-CN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
+  function renderActivity() {
+    if (!state.activityItems.length) {
+      const empty = document.createElement('li');
+      empty.className = 'activity-empty';
+      empty.textContent = t('等一束光，等一个人。');
+      dom.activityList.replaceChildren(empty);
+      return;
+    }
+    const nodes = state.activityItems.map((entry) => {
+      const item = document.createElement('li');
+      item.className = `activity-item is-${entry.tone}`;
+      const dot = document.createElement('span');
+      dot.className = 'activity-dot';
+      const paragraph = document.createElement('p');
+      const params = entry.params ? { ...entry.params } : null;
+      if (params && params.__selfActor) params.actor = t('你');
+      paragraph.textContent = entry.key ? t(entry.key, params) : entry.text;
+      const time = document.createElement('time');
+      time.textContent = new Date(entry.at).toLocaleTimeString(i18n.locale(), {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+      item.append(dot, paragraph, time);
+      return item;
     });
-    item.append(dot, paragraph, time);
-    dom.activityList.prepend(item);
-    while (dom.activityList.children.length > 16) dom.activityList.removeChild(dom.activityList.lastElementChild);
+    dom.activityList.replaceChildren(...nodes);
   }
 
-  function showSyncFlash(text = '进度已对齐') {
-    dom.syncFlash.querySelector('span').textContent = text;
+  function addActivity(spec, tone = 'neutral') {
+    if (!spec) return;
+    let entry;
+    if (typeof spec === 'string') {
+      entry = { key: spec, params: null, text: t(spec), tone, at: Date.now() };
+    } else {
+      entry = { key: spec.key, params: spec.params || null, text: '', tone, at: Date.now() };
+      entry.text = t(entry.key, entry.params);
+    }
+    state.activityItems.unshift(entry);
+    if (state.activityItems.length > 16) state.activityItems.length = 16;
+    renderActivity();
+  }
+
+  function showSyncFlash(text = null) {
+    dom.syncFlash.querySelector('span').textContent = text || t('进度已对齐');
     dom.syncFlash.classList.remove('is-hidden');
     window.clearTimeout(state.syncFlashTimer);
     requestAnimationFrame(() => dom.syncFlash.classList.add('is-visible'));
@@ -324,8 +367,12 @@
     }, 1800);
   }
 
+  function modalList() {
+    return [dom.entryOverlay, dom.inviteModal, dom.helpModal, dom.fatalOverlay, dom.sourceModal];
+  }
+
   function openModal(element) {
-    [dom.entryOverlay, dom.inviteModal, dom.helpModal, dom.fatalOverlay].forEach((modal) => {
+    modalList().forEach((modal) => {
       if (modal !== element) modal.classList.add('is-hidden');
     });
     element.classList.remove('is-hidden');
@@ -337,8 +384,7 @@
   function closeModal(element) {
     if (!element) return;
     element.classList.add('is-hidden');
-    const anyOpen = [dom.entryOverlay, dom.inviteModal, dom.helpModal, dom.fatalOverlay]
-      .some((modal) => !modal.classList.contains('is-hidden'));
+    const anyOpen = modalList().some((modal) => !modal.classList.contains('is-hidden'));
     if (!anyOpen) document.body.classList.remove('modal-open');
   }
 
@@ -381,15 +427,15 @@
     }
   }
 
-  async function copyWithFeedback(text, label = '已复制') {
+  async function copyWithFeedback(text, label) {
     const ok = await copyText(text);
-    toast(ok ? label : '复制失败，请手动选择复制', ok ? 'success' : 'error');
+    toast(ok ? (label || t('已复制')) : t('复制失败，请手动选择复制'), ok ? 'success' : 'error');
   }
 
   async function shareInvite() {
     const shareData = {
-      title: '同频 · 私人放映室',
-      text: `来和我一起看电影吧，房间码 ${ROOM_ID}`,
+      title: t('同频 · 私人放映室'),
+      text: t('来和我一起看电影吧，房间码 {code}', { code: ROOM_ID }),
       url: roomUrl,
     };
     if (navigator.share) {
@@ -400,7 +446,7 @@
         if (error && error.name === 'AbortError') return;
       }
     }
-    await copyWithFeedback(roomUrl, '邀请链接已复制');
+    await copyWithFeedback(roomUrl, t('邀请链接已复制'));
   }
 
   function populateInviteDialog() {
@@ -412,7 +458,7 @@
 
   function initials(name) {
     const trimmed = String(name || '').trim();
-    if (!trimmed) return '影';
+    if (!trimmed) return i18n.isEnglish() ? 'S' : '影';
     return [...trimmed][0].toUpperCase();
   }
 
@@ -438,10 +484,10 @@
 
     const name = document.createElement('span');
     name.className = 'participant-name';
-    name.append(document.createTextNode(participant && participant.name ? participant.name : state.selfName || '你'));
+    name.append(document.createTextNode(participant && participant.name ? participant.name : state.selfName || t('你')));
     if (isSelf) {
       const selfTag = document.createElement('em');
-      selfTag.textContent = '你';
+      selfTag.textContent = t('你');
       name.appendChild(selfTag);
     }
 
@@ -453,13 +499,13 @@
     }
     const statusText = document.createElement('span');
     if (!participant) {
-      statusText.textContent = '正在连接…';
+      statusText.textContent = t('正在连接…');
     } else if (!participant.online) {
-      statusText.textContent = '暂时离线';
+      statusText.textContent = t('暂时离线');
     } else if (participant.file) {
       statusText.textContent = `${formatDurationShort(participant.file.duration)} · ${participant.file.fingerprint.slice(0, 6)}`;
     } else {
-      statusText.textContent = '正在选择片源…';
+      statusText.textContent = t('正在选择片源…');
     }
     status.append(dot, statusText);
     copy.append(name, status);
@@ -467,21 +513,21 @@
     const tag = document.createElement('span');
     tag.className = 'participant-tag';
     if (!participant || !participant.online) {
-      tag.textContent = '离线';
+      tag.textContent = t('离线');
     } else if (!participant.file) {
-      tag.textContent = '未选片';
+      tag.textContent = t('未选片');
       tag.classList.add('is-waiting');
     } else if (isSelf) {
-      tag.textContent = '已就位';
+      tag.textContent = t('已就位');
       tag.classList.add('is-ready');
     } else if (state.filesMatch === true) {
-      tag.textContent = '匹配';
+      tag.textContent = t('匹配');
       tag.classList.add('is-ready');
     } else if (state.filesMatch === false) {
-      tag.textContent = '不同';
+      tag.textContent = t('不同');
       tag.classList.add('is-mismatch');
     } else {
-      tag.textContent = '就位';
+      tag.textContent = t('就位');
       tag.classList.add('is-ready');
     }
 
@@ -499,14 +545,14 @@
     copy.className = 'participant-copy';
     const name = document.createElement('span');
     name.className = 'participant-name';
-    name.textContent = '等待另一个人入座';
+    name.textContent = t('等待另一个人入座');
     const status = document.createElement('span');
     status.className = 'participant-status';
-    status.textContent = '把邀请链接发给 TA';
+    status.textContent = t('把邀请链接发给 TA');
     copy.append(name, status);
     const tag = document.createElement('span');
     tag.className = 'participant-tag';
-    tag.textContent = '空座';
+    tag.textContent = t('空座');
     item.append(avatar, copy, tag);
     return item;
   }
@@ -539,17 +585,19 @@
     dom.participantList.replaceChildren(...rows);
     dom.seatCount.textContent = `${state.participants.length || (state.selfName ? 1 : 0)} / 2`;
 
+    const peerDot = document.createElement('i');
     if (partner && partner.online) {
       dom.peerIndicator.classList.add('is-online');
-      dom.peerIndicator.innerHTML = '<i></i> TA 在线';
+      dom.peerIndicator.replaceChildren(peerDot, document.createTextNode(` ${t('TA 在线')}`));
     } else if (partner) {
       dom.peerIndicator.classList.remove('is-online');
-      dom.peerIndicator.innerHTML = '<i></i> TA 离线';
+      dom.peerIndicator.replaceChildren(peerDot, document.createTextNode(` ${t('TA 离线')}`));
     } else {
       dom.peerIndicator.classList.remove('is-online');
-      dom.peerIndicator.innerHTML = '<i></i> 等待 TA';
+      dom.peerIndicator.replaceChildren(peerDot, document.createTextNode(` ${t('等待 TA')}`));
     }
 
+    maybeAdoptPeerSource();
     updateSyncUI();
   }
 
@@ -565,16 +613,16 @@
     const partnerFile = state.partnerFile;
 
     let match = null;
-    let title = '等待双方片源';
-    let sub = '各自打开同一部电影';
+    let title = t('等待双方片源');
+    let sub = t('各自打开同一部电影');
     let className = '';
 
     if (!selfFile) {
-      title = '等待你的片源';
-      sub = '从本地选择一部电影';
+      title = t('等待你的片源');
+      sub = t('从本地选择一部电影');
       className = 'is-partial';
     } else if (!partnerFile) {
-      title = state.partner ? '等待 TA 的片源' : '等待 TA 入座';
+      title = state.partner ? t('等待 TA 的片源') : t('等待 TA 入座');
       sub = `${selfFile.fingerprint.slice(0, 8)} · ${formatDurationShort(selfFile.duration)}`;
       className = 'is-partial';
     } else {
@@ -583,18 +631,18 @@
       const sizeMatch = !selfFile.size || !partnerFile.size || Number(selfFile.size) === Number(partnerFile.size);
       if (fingerprintMatch && sizeMatch && durationDelta <= 2) {
         match = true;
-        title = '片源匹配成功';
-        sub = `同一部电影 · ${formatDurationShort(selfFile.duration)}`;
+        title = t('片源匹配成功');
+        sub = t('同一部电影 · {duration}', { duration: formatDurationShort(selfFile.duration) });
         className = 'is-matched';
       } else if (fingerprintMatch) {
         match = false;
-        title = '片源时长不一致';
-        sub = `相差 ${Math.round(durationDelta)} 秒，建议重新选择`;
+        title = t('片源时长不一致');
+        sub = t('相差 {value} 秒，建议重新选择', { value: Math.round(durationDelta) });
         className = 'is-mismatch';
       } else {
         match = false;
-        title = '片源不一致';
-        sub = '你们打开的可能不是同一个文件';
+        title = t('片源不一致');
+        sub = t('你们打开的可能不是同一个文件');
         className = 'is-mismatch';
       }
     }
@@ -606,11 +654,11 @@
     dom.matchMark.textContent = '';
 
     if (match === true) {
-      dom.filmSubline.textContent = `指纹 ${selfFile.fingerprint} · ${formatDurationShort(selfFile.duration)} · 仅在本机读取`;
+      dom.filmSubline.textContent = sourceSubline(selfFile);
     } else if (match === false) {
-      dom.filmSubline.textContent = '片源不一致，自动校准会暂停；请双方换成同一个文件。';
+      dom.filmSubline.textContent = t('片源不一致，自动校准会暂停；请双方换成同一个文件。');
     } else if (selfFile && state.hasVideo) {
-      dom.filmSubline.textContent = `指纹 ${selfFile.fingerprint} · ${formatDurationShort(selfFile.duration)} · 仅在本机读取`;
+      dom.filmSubline.textContent = sourceSubline(selfFile);
     }
 
     const matchKey = `${selfFile ? selfFile.fingerprint : 'none'}:${partnerFile ? partnerFile.fingerprint : 'none'}`;
@@ -618,45 +666,56 @@
       state.lastMatchNotice = matchKey;
       if (match && partnerFile) {
         addActivity('双方片源核对一致', 'success');
-        toast('片源匹配成功，可以一起开始了', 'success');
+        toast(t('片源匹配成功，可以一起开始了'), 'success');
       } else if (!match) {
         addActivity('检测到片源不一致', 'warning');
-        toast('你们选择的片源不一致，建议换成同一个文件', 'error', 5200);
+        toast(t('你们选择的片源不一致，建议换成同一个文件'), 'error', 5200);
       }
     }
     state.matchKey = matchKey;
   }
 
+  function sourceSubline(file) {
+    const duration = formatDurationShort(file.duration);
+    if (file && file.source && file.source.kind === 'url') {
+      return t('在线链接 · {duration} · 直接在浏览器播放', { duration });
+    }
+    return t('指纹 {fingerprint} · {duration} · 仅在本机读取', {
+      fingerprint: file.fingerprint,
+      duration,
+    });
+  }
+
   function updateSyncStatusPill() {
-    let text = '等待片源';
+    let text = t('等待片源');
     let className = 'screen-sync-pill is-waiting';
 
     if (!state.connected) {
-      text = '连接中断';
+      text = t('连接中断');
       className = 'screen-sync-pill is-offline';
     } else if (!state.hasVideo) {
-      text = '等待片源';
+      text = t('等待片源');
       className = 'screen-sync-pill is-waiting';
     } else if (!state.partner) {
-      text = '等待 TA 入座';
+      text = t('等待 TA 入座');
       className = 'screen-sync-pill is-waiting';
     } else if (!state.partner.online) {
-      text = 'TA 暂时离线';
+      text = t('TA 暂时离线');
       className = 'screen-sync-pill is-waiting';
     } else if (state.filesMatch === false) {
-      text = '片源不一致';
+      text = t('片源不一致');
       className = 'screen-sync-pill is-warning';
     } else if (state.needsGesture) {
-      text = '等待点击播放';
+      text = t('等待点击播放');
       className = 'screen-sync-pill is-waiting';
     } else if (state.buffering) {
-      text = '缓冲中';
+      text = t('缓冲中');
       className = 'screen-sync-pill is-waiting';
     } else if (state.roomState.playing) {
-      text = '同步播放中';
+      text = t('同步播放中');
       className = 'screen-sync-pill';
     } else {
-      text = '已暂停 · 同步中';
+      text = t('已暂停 · 同步中');
       className = 'screen-sync-pill';
     }
 
@@ -668,9 +727,9 @@
     updateSyncStatusPill();
     if (!state.hasVideo) {
       dom.offsetValue.textContent = '—';
-      dom.driftText.textContent = '等待同步';
+      dom.driftText.textContent = t('等待同步');
       dom.driftReadout.className = 'drift-readout';
-      dom.lastSync.textContent = '尚未校准';
+      dom.lastSync.textContent = t('尚未校准');
       dom.manualSync.disabled = true;
       dom.inlineSync.disabled = true;
       return;
@@ -679,22 +738,22 @@
     const drift = state.lastDrift;
     if (drift === null || !Number.isFinite(drift)) {
       dom.offsetValue.textContent = '—';
-      dom.driftText.textContent = '等待同步';
+      dom.driftText.textContent = t('等待同步');
       dom.driftReadout.className = 'drift-readout';
     } else {
       const abs = Math.abs(drift);
       dom.offsetValue.textContent = `${abs < 10 ? abs.toFixed(2) : Math.round(abs)}s`;
       if (state.filesMatch === false) {
-        dom.driftText.textContent = '片源不同';
+        dom.driftText.textContent = t('片源不同');
         dom.driftReadout.className = 'drift-readout is-danger';
       } else if (abs < 0.25) {
-        dom.driftText.textContent = `误差 ${abs.toFixed(2)}s`;
+        dom.driftText.textContent = t('误差 {value}s', { value: abs.toFixed(2) });
         dom.driftReadout.className = 'drift-readout';
       } else if (abs < AUTO_SYNC_THRESHOLD) {
-        dom.driftText.textContent = `偏差 ${abs.toFixed(2)}s`;
+        dom.driftText.textContent = t('偏差 {value}s', { value: abs.toFixed(2) });
         dom.driftReadout.className = 'drift-readout is-warning';
       } else {
-        dom.driftText.textContent = `偏差 ${abs.toFixed(1)}s`;
+        dom.driftText.textContent = t('偏差 {value}s', { value: abs.toFixed(1) });
         dom.driftReadout.className = 'drift-readout is-danger';
       }
     }
@@ -702,9 +761,9 @@
     const orbit = document.querySelector('.sync-orbit');
     if (orbit) orbit.classList.toggle('is-warning', state.filesMatch === false || (drift !== null && Math.abs(drift) > AUTO_SYNC_THRESHOLD));
     const pausedByMismatch = state.filesMatch === false;
-    dom.autoChip.textContent = pausedByMismatch ? '暂停' : (state.autoSync ? '自动' : '手动');
+    dom.autoChip.textContent = pausedByMismatch ? t('暂停') : (state.autoSync ? t('自动') : t('手动'));
     dom.autoChip.classList.toggle('is-off', !state.autoSync || pausedByMismatch);
-    dom.lastSync.textContent = state.lastSyncAt ? formatClock(state.lastSyncAt) : '尚未校准';
+    dom.lastSync.textContent = state.lastSyncAt ? formatClock(state.lastSyncAt) : t('尚未校准');
     dom.manualSync.disabled = !state.connected || !state.hasVideo;
     dom.inlineSync.disabled = !state.connected || !state.hasVideo;
   }
@@ -737,7 +796,7 @@
   function updatePlaybackUI() {
     const playing = state.hasVideo && !dom.player.paused && !dom.player.ended;
     setIcon(dom.playButton, playing ? '#i-pause' : '#i-play');
-    dom.playButton.setAttribute('aria-label', playing ? '暂停' : '播放');
+    dom.playButton.setAttribute('aria-label', playing ? t('暂停') : t('播放'));
     dom.centerPlay.classList.toggle('is-hidden', !state.hasVideo || playing || state.needsGesture || state.ended);
     dom.gestureCard.classList.toggle('is-hidden', !state.needsGesture || !state.hasVideo);
     dom.videoControls.classList.toggle('is-hidden', !state.hasVideo);
@@ -759,23 +818,31 @@
     const displayName = state.file.name.replace(/\.[^.]+$/, '') || state.file.name;
     dom.filmTitle.textContent = displayName;
     dom.filmTitle.title = state.file.name;
-    dom.filmState.textContent = '本地片源已就绪';
-    dom.fileSize.textContent = `${formatBytes(state.fileSize)}${state.videoWidth && state.videoHeight ? ` · ${state.videoWidth}×${state.videoHeight}` : ''}`;
+    dom.filmState.textContent = state.sourceKind === 'url' ? t('在线片源已就绪') : t('本地片源已就绪');
+    dom.sourceMode.textContent = state.sourceKind === 'url' ? t('在线播放') : t('本地播放');
+    dom.fileSize.textContent = state.sourceKind === 'url'
+      ? '—'
+      : `${formatBytes(state.fileSize)}${state.videoWidth && state.videoHeight ? ` · ${state.videoWidth}×${state.videoHeight}` : ''}`;
     dom.totalTime.textContent = formatTime(state.fileDuration);
     if (state.filesMatch !== false) {
-      dom.filmSubline.textContent = `指纹 ${state.fingerprint} · ${formatDurationShort(state.fileDuration)} · 仅在本机读取`;
+      dom.filmSubline.textContent = sourceSubline({
+        fingerprint: state.fingerprint,
+        duration: state.fileDuration,
+        source: state.sourceKind === 'url' ? { kind: 'url', url: state.sourceUrl } : null,
+      });
     }
     dom.replaceButton.hidden = false;
   }
 
   function resetVideoInfo() {
-    dom.filmTitle.textContent = '今晚的放映，还差一部电影';
+    dom.filmTitle.textContent = t('今晚的放映，还差一部电影');
     dom.filmTitle.title = '';
-    dom.filmState.textContent = '尚未选择片源';
+    dom.filmState.textContent = t('尚未选择片源');
     dom.fileSize.textContent = '—';
+    dom.sourceMode.textContent = t('本地播放');
     dom.totalTime.textContent = '00:00';
     dom.currentTime.textContent = '00:00';
-    dom.filmSubline.textContent = '选择影片后，会和 TA 自动核对是否为同一片源。';
+    dom.filmSubline.textContent = t('选择影片后，会和 TA 自动核对是否为同一片源。');
     dom.replaceButton.hidden = true;
   }
 
@@ -885,7 +952,9 @@
     if (Date.now() - state.lastAutoLogAt > 12000) {
       state.lastAutoLogAt = Date.now();
       const amount = Math.abs(drift);
-      addActivity(amount > 0.3 ? `自动校准了 ${amount.toFixed(1)} 秒偏差` : '自动校准了播放状态', 'success');
+      addActivity(amount > 0.3
+        ? { key: '自动校准了 {seconds} 秒偏差', params: { seconds: amount.toFixed(1) } }
+        : '自动校准了播放状态', 'success');
     }
   }
 
@@ -923,6 +992,9 @@
         size: state.fileSize,
         duration: state.fileDuration,
         name: state.file.name,
+        source: state.sourceKind === 'url'
+          ? { kind: 'url', url: state.sourceUrl }
+          : { kind: 'local' },
       },
     });
   }
@@ -937,7 +1009,7 @@
     if (message.room && message.room.duration) state.roomDuration = message.room.duration;
     if (Number.isFinite(message.serverTime)) state.clockOffset = message.serverTime - Date.now();
     state.clockSynced = true;
-    setConnection('online', '已连接');
+    setConnection('online', t('已连接'));
     closeModal(dom.entryOverlay);
     renderParticipants();
     updateSyncUI();
@@ -955,18 +1027,21 @@
     const fromSelf = roomState.updatedBy === state.selfId;
     state.roomState = roomState;
     state.ended = !roomState.playing && state.fileDuration > 0 && roomState.position >= state.fileDuration - 0.5;
-    const actorName = fromSelf ? '你' : (message.actor ? message.actor.name : 'TA');
+    const actorName = fromSelf ? t('你') : (message.actor ? message.actor.name : 'TA');
     const action = message.action || 'seek';
-    const actionText = {
-      play: '播放了影片',
-      pause: '暂停了影片',
-      seek: '调整了进度',
-      ended: '看完了影片',
-    }[action] || '更新了播放状态';
-    addActivity(`${actorName}${actionText}`, fromSelf ? 'neutral' : 'accent');
+    const actionKey = {
+      play: '{actor}播放了影片',
+      pause: '{actor}暂停了影片',
+      seek: '{actor}调整了进度',
+      ended: '{actor}看完了影片',
+    }[action] || '{actor}更新了播放状态';
+    addActivity({
+      key: actionKey,
+      params: fromSelf ? { actor: t('你'), __selfActor: true } : { actor: actorName },
+    }, fromSelf ? 'neutral' : 'accent');
     if (!fromSelf) {
-      if (action === 'play') toast(`${actorName} 按下了播放`, 'success', 2200);
-      else if (action === 'pause') toast(`${actorName} 暂停了影片`, '', 2200);
+      if (action === 'play') toast(t('{actor} 按下了播放', { actor: actorName }), 'success', 2200);
+      else if (action === 'pause') toast(t('{actor} 暂停了影片', { actor: actorName }), '', 2200);
     }
     updateSyncUI();
     if (state.hasVideo) {
@@ -1004,19 +1079,21 @@
     if (message.state) state.roomState = message.state;
     const fromSelf = message.actor && message.actor.id === state.selfId;
     state.lastSyncAt = Date.now();
-    addActivity(fromSelf ? '你发起了同步校准' : `${message.actor ? message.actor.name : 'TA'} 发起了同步校准`, 'success');
+    addActivity(fromSelf
+      ? '你发起了同步校准'
+      : { key: '{actor} 发起了同步校准', params: { actor: message.actor ? message.actor.name : 'TA' } }, 'success');
     if (state.hasVideo) {
       applyRoomState(state.roomState, { force: true, reason: 'manual' });
       showSyncFlash();
       dom.manualSync.classList.remove('is-syncing');
-      dom.manualSyncSub.textContent = `已对齐到 ${formatTime(projectState())}`;
+      dom.manualSyncSub.textContent = t('已对齐到 {time}', { time: formatTime(projectState()) });
       window.clearTimeout(state.manualResetTimer);
       state.manualResetTimer = window.setTimeout(() => {
-        dom.manualSyncSub.textContent = '让两个人回到同一秒';
+        dom.manualSyncSub.textContent = t('让两个人回到同一秒');
       }, 5000);
-      if (!fromSelf) toast('TA 把进度对齐了', 'success', 2400);
+      if (!fromSelf) toast(t('TA 把进度对齐了'), 'success', 2400);
     } else {
-      toast('先放入你的片源，才能一起同步', 'error');
+      toast(t('先放入你的片源，才能一起同步'), 'error');
     }
     updateSyncUI();
   }
@@ -1051,11 +1128,24 @@
         renderParticipants();
         if (message.actor && message.actor.id !== state.selfId) {
           const file = message.participant && message.participant.file;
-          addActivity(`${message.actor.name} 放入了${file ? `《${file.name.replace(/\.[^.]+$/, '')}》` : '片源'}`, 'accent');
+          if (file && file.name) {
+            addActivity({
+              key: '{actor} 放入了《{title}》',
+              params: { actor: message.actor.name, title: stripExtension(file.name) },
+            }, 'accent');
+          } else {
+            addActivity({ key: '{actor} 放入了片源', params: { actor: message.actor.name } }, 'accent');
+          }
         }
         break;
       case 'event':
-        if (message.text) addActivity(message.text, message.tone === 'join' ? 'accent' : 'neutral');
+        if (message.event === 'join' && message.name) {
+          addActivity({ key: '{name} 连接了放映室', params: { name: message.name } }, 'accent');
+        } else if (message.event === 'leave' && message.name) {
+          addActivity({ key: '{name} 暂时离线了', params: { name: message.name } }, 'neutral');
+        } else if (message.text) {
+          addActivity(message.text, message.tone === 'join' ? 'accent' : 'neutral');
+        }
         break;
       default:
         break;
@@ -1069,7 +1159,7 @@
     if (state.socket && (state.socket.readyState === WebSocket.OPEN || state.socket.readyState === WebSocket.CONNECTING)) return;
 
     state.connecting = true;
-    setConnection('connecting', state.reconnectAttempts > 0 ? '正在重连' : '连接中');
+    setConnection('connecting', state.reconnectAttempts > 0 ? t('正在重连') : t('连接中'));
     const params = new URLSearchParams({
       room: ROOM_ID,
       clientId: getClientId(),
@@ -1090,11 +1180,11 @@
       if (state.socket !== socket) return;
       state.connecting = false;
       state.connected = true;
-      setConnection('online', '已连接');
+      setConnection('online', t('已连接'));
       if (state.hasVideo) sendFileMeta();
       sendMessage({ type: 'heartbeat', position: dom.player.currentTime || 0, playing: !dom.player.paused, sentAt: Date.now() });
       if (state.reconnectAttempts > 0) {
-        toast('已经重新连上放映室', 'success', 2200);
+        toast(t('已经重新连上放映室'), 'success', 2200);
         addActivity('重新连接了放映室', 'success');
       }
     });
@@ -1111,22 +1201,22 @@
       state.socket = null;
       const code = event.code;
       if (code === 4003) {
-        showFatal('这间放映室已经满员了。', '两个座位都已经有人了。如果这是你的房间，请刷新原窗口，或回到首页创建新的放映室。');
+        showFatal(t('这间放映室已经满员了。'), t('两个座位都已经有人了。如果这是你的房间，请刷新原窗口，或回到首页创建新的放映室。'));
         return;
       }
       if (code === 4004) {
-        showFatal('没有找到这间放映室。', '房间码可能已经过期，或者链接不完整。回到首页，重新开一间只属于你们的放映室吧。');
+        showFatal(t('没有找到这间放映室。'), t('房间码可能已经过期，或者链接不完整。回到首页，重新开一间只属于你们的放映室吧。'));
         return;
       }
       if (code === 4001) {
-        showFatal('这个身份已在另一个窗口连接。', '同一间放映室不能打开两个相同的身份。请关闭其他窗口，再重新刷新这一页。');
+        showFatal(t('这个身份已在另一个窗口连接。'), t('同一间放映室不能打开两个相同的身份。请关闭其他窗口，再重新刷新这一页。'));
         return;
       }
       if (code === 1000) {
-        setConnection('offline', '已离开');
+        setConnection('offline', t('已离开'));
         return;
       }
-      setConnection('offline', '连接中断');
+      setConnection('offline', t('连接中断'));
       updateSyncUI();
       scheduleReconnect();
     });
@@ -1164,7 +1254,7 @@
       };
       const onError = () => {
         cleanup();
-        reject(new Error('这个视频格式无法在当前浏览器中播放'));
+        reject(new Error(t('这个视频格式无法在当前浏览器中播放')));
       };
       const cleanup = () => {
         clearTimeout(timer);
@@ -1173,7 +1263,7 @@
       };
       timer = window.setTimeout(() => {
         cleanup();
-        reject(new Error('读取视频信息超时，请换一个文件试试'));
+        reject(new Error(t('读取视频信息超时，请换一个文件试试')));
       }, timeoutMs);
       media.addEventListener(eventName, onEvent, { once: true });
       media.addEventListener('error', onError, { once: true });
@@ -1205,7 +1295,7 @@
       };
       timer = window.setTimeout(() => {
         if (!cleanup()) return;
-        reject(new Error('无法识别视频时长，请尝试 MP4 或常规 WebM 文件'));
+        reject(new Error(t('无法识别视频时长，请尝试 MP4 或常规 WebM 文件')));
       }, timeoutMs);
       media.addEventListener('durationchange', checkDuration);
       media.addEventListener('timeupdate', checkDuration);
@@ -1215,7 +1305,7 @@
         // the end makes Chromium scan the file and expose the real duration.
         media.currentTime = 1e101;
       } catch {
-        if (cleanup()) reject(new Error('无法读取视频时长'));
+        if (cleanup()) reject(new Error(t('无法读取视频时长')));
       }
     });
   }
@@ -1270,21 +1360,21 @@
   async function handleFile(file) {
     if (!file) return;
     if (!isVideoFile(file)) {
-      toast('请选择视频文件，例如 MP4、WebM 或 MOV', 'error');
+      toast(t('请选择视频文件，例如 MP4、WebM 或 MOV'), 'error');
       return;
     }
     if (!file.size) {
-      toast('这个文件是空的，换一个视频试试', 'error');
+      toast(t('这个文件是空的，换一个视频试试'), 'error');
       return;
     }
 
     const token = ++state.loadToken;
     dom.loading.classList.remove('is-hidden');
-    dom.loadingText.textContent = '正在读取片源…';
+    dom.loadingText.textContent = t('正在读取片源…');
     const newUrl = URL.createObjectURL(file);
 
     try {
-      dom.loadingText.textContent = '正在核对片源指纹…';
+      dom.loadingText.textContent = t('正在核对片源指纹…');
       const [fingerprint, metadata] = await Promise.all([
         fingerprintFile(file),
         probeVideo(newUrl),
@@ -1309,7 +1399,7 @@
         return;
       }
 
-      dom.loadingText.textContent = '正在准备播放器…';
+      dom.loadingText.textContent = t('正在准备播放器…');
       let playbackDuration = metadata.duration;
       try {
         playbackDuration = await resolveMediaDuration(dom.player);
@@ -1325,6 +1415,8 @@
 
       state.file = file;
       state.fileUrl = newUrl;
+      state.sourceKind = 'local';
+      state.sourceUrl = '';
       state.fingerprint = fingerprint;
       state.fileDuration = playbackDuration;
       state.videoWidth = metadata.width;
@@ -1349,8 +1441,8 @@
       sendFileMeta();
       evaluateFiles();
       updateSyncUI();
-      addActivity(`你载入了《${file.name.replace(/\.[^.]+$/, '')}》`, 'accent');
-      toast('片源已就绪，只在你本机播放', 'success', 2600);
+      addActivity({ key: '你载入了《{title}》', params: { title: stripExtension(file.name) } }, 'accent');
+      toast(t('片源已就绪，只在你本机播放'), 'success', 2600);
 
       if (state.roomState.updatedAt && (state.roomState.playing || state.roomState.position > 0.2)) {
         await applyRoomState(state.roomState, { force: true, reason: 'file' });
@@ -1374,7 +1466,7 @@
           dom.player.load();
         }
       }
-      toast(error.message || '无法读取这个视频文件', 'error', 5000);
+      toast(error.message || t('无法读取这个视频文件'), 'error', 5000);
     } finally {
       dom.fileInput.value = '';
     }
@@ -1382,6 +1474,239 @@
 
   function chooseFile() {
     dom.fileInput.click();
+  }
+
+  /* ---------------- 在线视频链接 ---------------- */
+
+  function stripExtension(name) {
+    return String(name || '').replace(/\.[^.]+$/, '');
+  }
+
+  function revokeIfBlob(url) {
+    if (!url || !String(url).startsWith('blob:')) return;
+    try { URL.revokeObjectURL(url); } catch { /* ignore */ }
+  }
+
+  const PAGE_HOSTS = /(^|\.)(youtube\.com|youtu\.be|bilibili\.com|vimeo\.com|netflix\.com|douyin\.com|tiktok\.com|iqiyi\.com|youku\.com|ixigua\.com|weibo\.com)$/i;
+
+  function validateVideoUrl(raw) {
+    const input = String(raw || '').trim();
+    if (!input) return { error: t('请输入视频链接') };
+    let parsed;
+    try {
+      parsed = new URL(input.startsWith('//') ? `https:${input}` : input);
+    } catch {
+      return { error: t('链接格式不对，请粘贴 http 或 https 开头的地址') };
+    }
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      return { error: t('链接格式不对，请粘贴 http 或 https 开头的地址') };
+    }
+    if (PAGE_HOSTS.test(parsed.hostname) || /\.(html?|php|aspx)$/i.test(parsed.pathname)) {
+      return { error: t('这是一个网页地址，不是视频文件。请粘贴 .mp4 / .webm / .m3u8 直链。') };
+    }
+    return { url: parsed.href };
+  }
+
+  function fingerprintUrl(url) {
+    const text = `tongpin:url:${url}`;
+    let first = 0x811c9dc5;
+    let second = 0x9e3779b9;
+    for (let index = 0; index < text.length; index += 1) {
+      const code = text.charCodeAt(index);
+      first = Math.imul(first ^ code, 0x01000193) >>> 0;
+      second = Math.imul(second ^ code, 0x9e3779b9) >>> 0;
+    }
+    return `${hex8(first)}${hex8(second)}`.toUpperCase();
+  }
+
+  function sourceNameFromUrl(url) {
+    try {
+      const parsed = new URL(url);
+      const last = parsed.pathname.split('/').filter(Boolean).pop();
+      if (last) return decodeURIComponent(last);
+      return parsed.hostname;
+    } catch {
+      return t('在线片源');
+    }
+  }
+
+  function isHlsUrl(url) {
+    return /\.m3u8(\?|#|$)/i.test(url);
+  }
+
+  function destroyHls() {
+    if (!state.hls) return;
+    try { state.hls.destroy(); } catch { /* ignore */ }
+    state.hls = null;
+  }
+
+  let hlsLoader = null;
+
+  function loadHlsLibrary() {
+    if (window.Hls) return Promise.resolve(window.Hls);
+    if (hlsLoader) return hlsLoader;
+    hlsLoader = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = HLS_CDN;
+      script.async = true;
+      script.onload = () => (window.Hls ? resolve(window.Hls) : reject(new Error('hls-unavailable')));
+      script.onerror = () => reject(new Error('hls-unavailable'));
+      document.head.appendChild(script);
+    });
+    hlsLoader.catch(() => { hlsLoader = null; });
+    return hlsLoader;
+  }
+
+  async function attachMediaSource(url) {
+    destroyHls();
+    if (isHlsUrl(url) && !dom.player.canPlayType('application/vnd.apple.mpegurl')) {
+      const Hls = await loadHlsLibrary();
+      const hls = new Hls({ enableWorker: true });
+      state.hls = hls;
+      hls.attachMedia(dom.player);
+      hls.loadSource(url);
+      return;
+    }
+    dom.player.src = url;
+    dom.player.load();
+  }
+
+  let peerNoticeShown = false;
+
+  async function handleUrl(rawUrl, { fromPeer = false } = {}) {
+    const check = validateVideoUrl(rawUrl);
+    if (check.error) {
+      if (!fromPeer) showSourceError(check.error);
+      return false;
+    }
+    const url = check.url;
+
+    const token = ++state.loadToken;
+    closeModal(dom.sourceModal);
+    clearSourceError();
+    dom.loading.classList.remove('is-hidden');
+    dom.loadingText.textContent = t('正在连接在线片源…');
+
+    let metadata = { duration: 0, width: 0, height: 0 };
+    try {
+      metadata = await probeVideo(url);
+    } catch {
+      // 探测失败不代表不能播放，交给播放器再试一次。
+    }
+    if (token !== state.loadToken) return false;
+
+    const previousUrl = state.fileUrl;
+    try {
+      if (!dom.player.paused) {
+        suppressControlEvents(900);
+        dom.player.pause();
+      }
+      const ready = waitForMediaEvent(dom.player, 'loadedmetadata', 25000);
+      await attachMediaSource(url);
+      await ready;
+      if (token !== state.loadToken) return false;
+
+      dom.loadingText.textContent = t('正在准备播放器…');
+      let playbackDuration = metadata.duration;
+      try {
+        playbackDuration = await resolveMediaDuration(dom.player, 8000);
+      } catch {
+        playbackDuration = metadata.duration;
+      }
+      if (token !== state.loadToken) return false;
+
+      revokeIfBlob(previousUrl);
+      const name = sourceNameFromUrl(url);
+      state.file = { name, size: 0 };
+      state.fileUrl = url;
+      state.sourceKind = 'url';
+      state.sourceUrl = url;
+      state.fingerprint = fingerprintUrl(url);
+      state.fileDuration = playbackDuration;
+      state.videoWidth = metadata.width;
+      state.videoHeight = metadata.height;
+      state.fileSize = 0;
+      state.hasVideo = true;
+      state.needsGesture = false;
+      state.buffering = false;
+      state.ended = false;
+      state.lastDrift = null;
+
+      dom.player.volume = dom.volume.valueAsNumber;
+      dom.player.muted = false;
+      dom.stageFrame.classList.add('has-video');
+      dom.stageFrame.classList.remove('is-dragging');
+      dom.emptyState.classList.add('is-hidden');
+      dom.loading.classList.add('is-hidden');
+      dom.videoControls.classList.remove('is-hidden');
+      setVideoInfo();
+      updatePlaybackUI();
+      updateTimelineUI();
+      sendFileMeta();
+      evaluateFiles();
+      updateSyncUI();
+      addActivity({ key: '你载入了在线片源《{title}》', params: { title: stripExtension(name) } }, 'accent');
+      toast(fromPeer
+        ? t('TA 正在使用在线片源，已为你同步载入')
+        : t('在线片源已载入'), 'success', 3000);
+
+      if (state.roomState.updatedAt && (state.roomState.playing || state.roomState.position > 0.2)) {
+        await applyRoomState(state.roomState, { force: true, reason: 'file' });
+      } else {
+        updatePlaybackUI();
+      }
+      return true;
+    } catch {
+      dom.loading.classList.add('is-hidden');
+      destroyHls();
+      if (state.hasVideo && state.fileUrl) {
+        try {
+          dom.player.src = state.fileUrl;
+          dom.player.load();
+        } catch {
+          // Keep whatever the player had.
+        }
+      }
+      const message = t('无法载入这个链接：可能是防盗链、跨域限制或格式不支持。');
+      if (fromPeer) {
+        if (!peerNoticeShown) {
+          peerNoticeShown = true;
+          toast(message, 'error', 5000);
+        }
+      } else {
+        showSourceError(message);
+        openModal(dom.sourceModal);
+      }
+      return false;
+    }
+  }
+
+  function maybeAdoptPeerSource() {
+    const file = state.partnerFile;
+    if (!file || !file.source || file.source.kind !== 'url') return;
+    if (state.hasVideo) return;
+    if (!state.partner || !state.partner.online) return;
+    if (state.peerSourceAttempted === file.source.url) return;
+    state.peerSourceAttempted = file.source.url;
+    handleUrl(file.source.url, { fromPeer: true });
+  }
+
+  function showSourceError(message) {
+    if (!dom.sourceError) return;
+    dom.sourceError.textContent = message;
+    dom.sourceError.classList.add('is-visible');
+  }
+
+  function clearSourceError() {
+    if (!dom.sourceError) return;
+    dom.sourceError.textContent = '';
+    dom.sourceError.classList.remove('is-visible');
+  }
+
+  function openSourceDialog() {
+    clearSourceError();
+    if (state.sourceKind === 'url' && state.sourceUrl) dom.sourceUrl.value = state.sourceUrl;
+    openModal(dom.sourceModal);
   }
 
   /* ---------------- Actions ---------------- */
@@ -1448,7 +1773,7 @@
   function updateVolumeIcon() {
     const muted = dom.player.muted || dom.player.volume === 0;
     setIcon(dom.muteButton, muted ? '#i-mute' : '#i-volume');
-    dom.muteButton.setAttribute('aria-label', muted ? '取消静音' : '静音');
+    dom.muteButton.setAttribute('aria-label', muted ? t('取消静音') : t('静音'));
     dom.volume.value = String(dom.player.muted ? 0 : dom.player.volume);
     dom.volume.style.setProperty('--volume', `${(dom.player.muted ? 0 : dom.player.volume) * 100}%`);
   }
@@ -1470,28 +1795,28 @@
           // Fall through to the hint below.
         }
       }
-      toast('当前浏览器不支持全屏，试试用浏览器菜单进入全屏', '', 3000);
+      toast(t('当前浏览器不支持全屏，试试用浏览器菜单进入全屏'), '', 3000);
     }
   }
 
   function manualSync() {
     if (!state.connected) {
-      toast('连接中断了，正在尝试重连', 'error');
+      toast(t('连接中断了，正在尝试重连'), 'error');
       return;
     }
     if (!state.hasVideo) {
-      toast('先选择你的本地片源，才能同步进度', 'error');
+      toast(t('先选择你的本地片源，才能同步进度'), 'error');
       chooseFile();
       return;
     }
     if (state.filesMatch === false) {
-      toast('双方片源不一致，时间可以对齐，但画面可能不同', '', 3600);
+      toast(t('双方片源不一致，时间可以对齐，但画面可能不同'), '', 3600);
     }
     dom.manualSync.classList.add('is-syncing');
     const sent = sendMessage({ type: 'request-sync' });
     if (!sent) {
       dom.manualSync.classList.remove('is-syncing');
-      toast('请求没有发出去，请检查网络连接', 'error');
+      toast(t('请求没有发出去，请检查网络连接'), 'error');
       return;
     }
     window.setTimeout(() => dom.manualSync.classList.remove('is-syncing'), 2400);
@@ -1506,7 +1831,23 @@
 
   function wireEvents() {
     dom.pickButton.addEventListener('click', chooseFile);
-    dom.replaceButton.addEventListener('click', chooseFile);
+    dom.urlOpen.addEventListener('click', openSourceDialog);
+    dom.replaceButton.addEventListener('click', openSourceDialog);
+    dom.sourceFile.addEventListener('click', () => {
+      closeModal(dom.sourceModal);
+      chooseFile();
+    });
+    dom.sourceUrl.addEventListener('input', clearSourceError);
+    dom.sourceForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const check = validateVideoUrl(dom.sourceUrl.value);
+      if (check.error) {
+        showSourceError(check.error);
+        dom.sourceUrl.focus();
+        return;
+      }
+      handleUrl(check.url);
+    });
     dom.fileInput.addEventListener('change', () => {
       const file = dom.fileInput.files && dom.fileInput.files[0];
       if (file) handleFile(file);
@@ -1634,7 +1975,7 @@
 
     dom.player.addEventListener('error', () => {
       if (state.hasVideo && dom.player.error) {
-        toast('视频播放出错了，尝试换一个格式（推荐 MP4 / H.264）', 'error', 5000);
+        toast(t('视频播放出错了，尝试换一个格式（推荐 MP4 / H.264）'), 'error', 5000);
       }
     });
 
@@ -1695,7 +2036,7 @@
       state.autoSync = dom.autoSyncToggle.checked;
       try { localStorage.setItem(AUTO_SYNC_KEY, state.autoSync ? 'on' : 'off'); } catch { /* ignore */ }
       addActivity(state.autoSync ? '开启了自动校准' : '暂停了自动校准', state.autoSync ? 'success' : 'neutral');
-      toast(state.autoSync ? '自动校准已开启，每 3 秒检测一次' : '自动校准已暂停，仍可手动同步', state.autoSync ? 'success' : '', 2600);
+      toast(state.autoSync ? t('自动校准已开启，每 3 秒检测一次') : t('自动校准已暂停，仍可手动同步'), state.autoSync ? 'success' : '', 2600);
       updateSyncUI();
     });
 
@@ -1707,13 +2048,13 @@
       await tryPlay({ broadcast: false });
     });
 
-    dom.copyCodeTop.addEventListener('click', () => copyWithFeedback(ROOM_ID, '房间码已复制'));
-    dom.copyCode.addEventListener('click', () => copyWithFeedback(ROOM_ID, '房间码已复制'));
-    dom.copyLink.addEventListener('click', () => copyWithFeedback(roomUrl, '邀请链接已复制'));
+    dom.copyCodeTop.addEventListener('click', () => copyWithFeedback(ROOM_ID, t('房间码已复制')));
+    dom.copyCode.addEventListener('click', () => copyWithFeedback(ROOM_ID, t('房间码已复制')));
+    dom.copyLink.addEventListener('click', () => copyWithFeedback(roomUrl, t('邀请链接已复制')));
     dom.shareButton.addEventListener('click', shareInvite);
     dom.inviteButton.addEventListener('click', openInvite);
-    dom.dialogCopyLink.addEventListener('click', () => copyWithFeedback(roomUrl, '邀请链接已复制'));
-    dom.dialogCopyCode.addEventListener('click', () => copyWithFeedback(ROOM_ID, '房间码已复制'));
+    dom.dialogCopyLink.addEventListener('click', () => copyWithFeedback(roomUrl, t('邀请链接已复制')));
+    dom.dialogCopyCode.addEventListener('click', () => copyWithFeedback(ROOM_ID, t('房间码已复制')));
     dom.dialogShare.addEventListener('click', shareInvite);
     dom.helpButton.addEventListener('click', () => openModal(dom.helpModal));
 
@@ -1725,7 +2066,7 @@
       event.preventDefault();
       const name = dom.entryName.value.trim();
       if (!name) {
-        dom.entryError.textContent = '留一个 TA 熟悉的昵称吧。';
+        dom.entryError.textContent = t('留一个 TA 熟悉的昵称吧。');
         dom.entryName.focus();
         return;
       }
@@ -1740,11 +2081,12 @@
       if (event.key === 'Escape') {
         if (!dom.inviteModal.classList.contains('is-hidden')) closeModal(dom.inviteModal);
         else if (!dom.helpModal.classList.contains('is-hidden')) closeModal(dom.helpModal);
+        else if (!dom.sourceModal.classList.contains('is-hidden')) closeModal(dom.sourceModal);
         return;
       }
       const target = event.target;
       if (target instanceof Element && target.closest('input, textarea, select, button, a, [contenteditable="true"]')) return;
-      if (!dom.entryOverlay.classList.contains('is-hidden') || !dom.inviteModal.classList.contains('is-hidden') || !dom.helpModal.classList.contains('is-hidden')) return;
+      if (modalList().some((modal) => modal && !modal.classList.contains('is-hidden'))) return;
       if (!state.hasVideo) return;
       if (event.code === 'Space') {
         event.preventDefault();
@@ -1772,7 +2114,7 @@
 
     window.addEventListener('beforeunload', () => {
       if (state.socket) {
-        try { state.socket.close(1000, '页面关闭'); } catch { /* ignore */ }
+        try { state.socket.close(1000, 'page closed'); } catch { /* ignore */ }
       }
     });
 
@@ -1801,7 +2143,7 @@
     dom.entryRoomCode.textContent = ROOM_ID;
     dom.inviteLinkInput.value = roomUrl;
     dom.roomDate.textContent = formatRoomDate();
-    document.title = `放映室 ${ROOM_ID} · 同频`;
+    document.title = t('放映室 {code} · 同频', { code: ROOM_ID });
 
     state.autoSync = readAutoSync();
     dom.autoSyncToggle.checked = state.autoSync;
@@ -1812,12 +2154,31 @@
     updateSyncUI();
   }
 
+  function renderTranslations() {
+    dom.roomDate.textContent = formatRoomDate();
+    document.title = t('放映室 {code} · 同频', { code: ROOM_ID });
+    if (state.hasVideo) setVideoInfo();
+    else resetVideoInfo();
+    renderActivity();
+    renderParticipants();
+    updateVolumeIcon();
+    updatePlaybackUI();
+    updateSyncUI();
+    dom.manualSyncSub.textContent = state.lastSyncAt
+      ? t('已对齐到 {time}', { time: formatTime(projectState()) })
+      : t('让两个人回到同一秒');
+  }
+
   function init() {
     initRoomIdentity();
     wireEvents();
+    resetVideoInfo();
+    renderActivity();
     state.selfName = nameStorage.getSession();
     dom.entryName.value = state.selfName || nameStorage.getLocal();
     startHeartbeat();
+
+    if (window.I18N) window.I18N.onChange(renderTranslations);
 
     if (state.selfName) {
       dom.entryOverlay.classList.add('is-hidden');

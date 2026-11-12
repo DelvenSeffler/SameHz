@@ -1,6 +1,8 @@
 'use strict';
 
 (() => {
+  const t = (key, params) => (window.I18N ? window.I18N.t(key, params) : key);
+
   const form = document.getElementById('start-form');
   const nicknameInput = document.getElementById('nickname');
   const roomField = document.getElementById('room-field');
@@ -46,7 +48,7 @@
     });
     roomField.classList.toggle('is-hidden', mode !== 'join');
     roomInput.required = mode === 'join';
-    submitLabel.textContent = mode === 'create' ? '创建今晚的放映室' : '进入放映室';
+    submitLabel.textContent = mode === 'create' ? t('创建今晚的放映室') : t('进入放映室');
     if (mode === 'join') {
       window.setTimeout(() => roomInput.focus(), 50);
     }
@@ -68,9 +70,9 @@
     submitButton.disabled = loading;
     submitButton.classList.toggle('is-loading', loading);
     if (loading) {
-      submitLabel.textContent = mode === 'create' ? '正在点亮放映室…' : '正在寻找放映室…';
+      submitLabel.textContent = mode === 'create' ? t('正在点亮放映室…') : t('正在寻找放映室…');
     } else {
-      submitLabel.textContent = mode === 'create' ? '创建今晚的放映室' : '进入放映室';
+      submitLabel.textContent = mode === 'create' ? t('创建今晚的放映室') : t('进入放映室');
     }
   }
 
@@ -107,7 +109,7 @@
 
     const name = nicknameInput.value.trim();
     if (!name) {
-      showError('先告诉 TA，该怎么称呼你。');
+      showError(t('先告诉 TA，该怎么称呼你。'));
       nicknameInput.focus();
       return;
     }
@@ -116,7 +118,7 @@
     if (mode === 'join') {
       roomCode = roomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
       if (roomCode.length !== 6) {
-        showError('房间码是 6 位字符，再检查一下邀请信息。');
+        showError(t('房间码是 6 位字符，再检查一下邀请信息。'));
         roomInput.focus();
         return;
       }
@@ -131,7 +133,7 @@
           body: JSON.stringify({ name }),
         });
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.error || '放映室没有创建成功，请稍后再试。');
+        if (!response.ok) throw new Error(data.error || t('放映室没有创建成功，请稍后再试。'));
         saveName(name);
         location.href = `/room/${data.roomId}`;
         return;
@@ -139,15 +141,22 @@
 
       const response = await fetch(`/api/rooms/${roomCode}`, { headers: { Accept: 'application/json' } });
       const data = await response.json().catch(() => ({}));
-      if (response.status === 404) throw new Error('没有找到这间放映室，房间码可能过期了。');
-      if (!response.ok) throw new Error(data.error || '暂时无法加入，请稍后再试。');
-      if (data.participants >= data.capacity) throw new Error('放映室已经满员了，只容得下两个人。');
+      if (response.status === 404) throw new Error(t('没有找到这间放映室，房间码可能过期了。'));
+      if (!response.ok) throw new Error(data.error || t('暂时无法加入，请稍后再试。'));
+      if (data.participants >= data.capacity) throw new Error(t('放映室已经满员了，只容得下两个人。'));
       saveName(name);
       location.href = `/room/${data.roomId}`;
     } catch (error) {
       setLoading(false);
-      showError(error.message || '网络似乎走神了，请再试一次。');
+      showError(error.message || t('网络似乎走神了，请再试一次。'));
       submitButton.disabled = false;
     }
   });
+
+  if (window.I18N) {
+    window.I18N.onChange(() => {
+      setMode(mode);
+      clearError();
+    });
+  }
 })();

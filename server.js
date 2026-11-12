@@ -88,8 +88,17 @@ function cleanFileMeta(value) {
     size: Number.isFinite(size) && size >= 0 ? Math.round(size) : 0,
     duration: Number.isFinite(duration) && duration > 0 ? Math.round(duration * 100) / 100 : 0,
     name: name || '本地视频',
+    source: cleanSource(value.source),
     updatedAt: Date.now(),
   };
+}
+
+function cleanSource(value) {
+  if (!value || typeof value !== 'object') return { kind: 'local' };
+  if (String(value.kind) !== 'url') return { kind: 'local' };
+  const url = String(value.url || '').trim();
+  if (!/^https?:\/\//i.test(url) || url.length > 2000) return { kind: 'local' };
+  return { kind: 'url', url };
 }
 
 function projectPosition(room, at = Date.now()) {
@@ -147,15 +156,6 @@ function broadcastParticipants(room) {
   broadcast(room, {
     type: 'participants',
     participants,
-    serverTime: Date.now(),
-  });
-}
-
-function systemEvent(room, text, tone = 'neutral') {
-  broadcast(room, {
-    type: 'event',
-    text,
-    tone,
     serverTime: Date.now(),
   });
 }
@@ -283,7 +283,14 @@ function registerSocket(ws, room, participant, name) {
   });
 
   broadcastParticipants(room);
-  systemEvent(room, `${participant.name} 连接了放映室`, 'join');
+  broadcast(room, {
+    type: 'event',
+    event: 'join',
+    name: participant.name,
+    text: `${participant.name} 连接了放映室`,
+    tone: 'join',
+    serverTime: Date.now(),
+  });
 
   ws.isAlive = true;
   ws.messageCount = 0;
@@ -327,7 +334,14 @@ function registerSocket(ws, room, participant, name) {
     participant.file = null;
     refreshRoomDuration(room);
     broadcastParticipants(room);
-    systemEvent(room, `${participant.name} 暂时离线了`, 'leave');
+    broadcast(room, {
+      type: 'event',
+      event: 'leave',
+      name: participant.name,
+      text: `${participant.name} 暂时离线了`,
+      tone: 'leave',
+      serverTime: Date.now(),
+    });
 
     participant.disconnectTimer = setTimeout(() => {
       if (participant.ws) return;

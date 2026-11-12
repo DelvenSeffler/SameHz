@@ -8,6 +8,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test:protocol": "node tools/test-protocol.js",
+    "test:features": "node tools/test-features.js",
     "test:e2e": "node tools/e2e.js",
     "sample": "node tools/make-sample.js"
   },

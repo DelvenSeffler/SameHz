@@ -35,10 +35,29 @@ function waitFor(ws, type, timeout = 3000) {
   if (state.state.position !== 12.5 || !state.state.playing) throw new Error('state not applied');
   if (state.actor.name !== '小满') throw new Error('actor missing');
 
-  b.send(JSON.stringify({ type: 'file-meta', file: { fingerprint: 'AABBCCDDEEFF0011', size: 1000, duration: 14, name: 'test.webm' } }));
+  b.send(JSON.stringify({
+    type: 'file-meta',
+    file: {
+      fingerprint: 'AABBCCDDEEFF0011',
+      size: 1000,
+      duration: 14,
+      name: 'test.webm',
+      source: { kind: 'url', url: 'https://example.com/film.mp4' },
+    },
+  }));
   const participants = await waitFor(a, 'participants');
   const bMeta = participants.participants.find((p) => p.id === 'bbbbbbbb-2222');
   if (!bMeta || bMeta.file.fingerprint !== 'AABBCCDDEEFF0011') throw new Error('file meta missing');
+  if (!bMeta.file.source || bMeta.file.source.kind !== 'url') throw new Error('url source not forwarded');
+  if (bMeta.file.source.url !== 'https://example.com/film.mp4') throw new Error('url source mangled');
+
+  b.send(JSON.stringify({
+    type: 'file-meta',
+    file: { fingerprint: 'AABBCCDDEEFF0022', size: 0, duration: 14, name: 'bad.mp4', source: { kind: 'url', url: 'javascript:alert(1)' } },
+  }));
+  const participants2 = await waitFor(a, 'participants');
+  const bMeta2 = participants2.participants.find((p) => p.id === 'bbbbbbbb-2222');
+  if (!bMeta2 || !bMeta2.file.source || bMeta2.file.source.kind !== 'local') throw new Error('unsafe url not sanitised');
 
   const checkA = waitFor(a, 'sync-check');
   a.send(JSON.stringify({ type: 'heartbeat', position: 13, playing: true, sentAt: Date.now() }));

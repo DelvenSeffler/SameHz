@@ -241,6 +241,19 @@
   color: #1a100b;
 }
 
+.room-lang-toggle {
+  height: 34px;
+  min-width: 40px;
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+.room-lang-toggle:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .nav-ghost-button:hover .icon {
   color: #1a100b;
 }
@@ -523,6 +536,36 @@
   color: var(--muted-dim);
   font-size: 9px;
   letter-spacing: 0.02em;
+}
+
+.ghost-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  margin-top: 10px;
+  padding: 0 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--ink-soft);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
+}
+
+.ghost-action .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.ghost-action:hover {
+  color: var(--ink);
+  border-color: rgba(255, 139, 111, 0.45);
+  background: rgba(255, 139, 111, 0.06);
 }
 
 .privacy-mini {
@@ -2485,6 +2528,25 @@
 }
 
 .invite-link-field button:hover { background: rgba(255, 255, 255, 0.07); }
+
+.source-dialog .invite-link-field input {
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.source-dialog .invite-link-field > div {
+  border-color: var(--line-strong);
+}
+
+.source-dialog .dialog-actions {
+  margin-top: 14px;
+}
+
+.source-dialog .entry-error {
+  margin: 10px 0 0;
+}
 
 .dialog-actions {
   display: grid;

@@ -9,6 +9,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/room.css">
+  <script src="/js/i18n.js" defer></script>
 </head>
 <body class="room-page">
   <svg class="icon-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -72,6 +73,7 @@
         <i></i>
         <span id="connection-text">连接中</span>
       </span>
+      <button class="lang-toggle room-lang-toggle" type="button" data-lang-toggle aria-label="Switch to English">EN</button>
       <button class="nav-ghost-button" id="invite-button" type="button">
         <svg class="icon"><use href="#i-users"></use></svg>
         <span>邀请 TA</span>
@@ -96,10 +98,14 @@
             </div>
             <p class="stage-kicker">YOUR LOCAL COPY</p>
             <h1>把今晚的电影<br>放进来。</h1>
-            <p class="empty-copy">选择你设备里的视频文件。它不会被上传，只在这里播放；TA 需要在自己那边打开同一部片。</p>
+            <p class="empty-copy">选择你设备里的视频文件，或者粘贴一个视频链接。它不会被上传，只在这里播放；TA 需要在自己那边打开同一部片。</p>
             <button class="accent-action" id="pick-button" type="button">
               <svg class="icon"><use href="#i-upload"></use></svg>
               <span>选择本地视频</span>
+            </button>
+            <button class="ghost-action" id="url-open" type="button">
+              <svg class="icon"><use href="#i-link"></use></svg>
+              <span>粘贴视频链接</span>
             </button>
             <span class="drag-hint">也可以把文件拖到这里</span>
             <p class="privacy-mini">
@@ -203,7 +209,7 @@
             <i></i>
             <span id="file-size">—</span>
             <i></i>
-            <span>本地播放</span>
+            <span id="source-mode">本地播放</span>
           </p>
           <h2 id="film-title">今晚的放映，还差一部电影</h2>
           <p class="film-subline" id="film-subline">选择影片后，会和 TA 自动核对是否为同一片源。</p>
@@ -320,7 +326,7 @@
           <circle cx="20" cy="20" r="13" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="1.5 3.5"/>
         </svg>
       </div>
-      <p class="entry-kicker">YOU'RE INVITED · 双人专场</p>
+      <p class="entry-kicker">YOU'RE INVITED · <span>双人专场</span></p>
       <h1 id="entry-title">今晚，一起看场电影。</h1>
       <p class="entry-copy">你收到了一张私人放映邀请。取一个 TA 熟悉的昵称，坐到同一块银幕前。</p>
       <div class="entry-room-code">
@@ -377,6 +383,35 @@
     </section>
   </div>
 
+  <div class="modal-layer is-hidden" id="source-modal">
+    <div class="modal-backdrop" data-close-modal="source-modal" aria-hidden="true"></div>
+    <section class="dialog-card source-dialog" role="dialog" aria-modal="true" aria-labelledby="source-title">
+      <button class="dialog-close" type="button" data-close-modal="source-modal" aria-label="关闭">
+        <svg class="icon"><use href="#i-close"></use></svg>
+      </button>
+      <p class="dialog-kicker">PLAY FROM THE INTERNET</p>
+      <h2 id="source-title">载入在线视频</h2>
+      <p class="dialog-copy">粘贴一个可以直接播放的视频链接，比如 MP4、WebM 或 HLS（m3u8）。两个人粘贴同一个链接，就能同步观看。</p>
+      <form id="source-form">
+        <label class="invite-link-field">
+          <span>视频链接</span>
+          <div>
+            <input id="source-url" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="例如：https://example.com/movie.mp4">
+          </div>
+        </label>
+        <p class="entry-error" id="source-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button class="dialog-primary" id="source-submit" type="submit">播放链接</button>
+          <button class="dialog-secondary" id="source-file" type="button">
+            <svg class="icon"><use href="#i-upload"></use></svg>
+            从设备选择文件
+          </button>
+        </div>
+      </form>
+      <p class="dialog-footnote">支持 MP4 / WebM / HLS 直链；网页地址（如 YouTube）暂不支持。</p>
+    </section>
+  </div>
+
   <div class="modal-layer is-hidden" id="help-modal">
     <div class="modal-backdrop" data-close-modal="help-modal" aria-hidden="true"></div>
     <section class="dialog-card help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-title">
@@ -386,7 +421,7 @@
       <p class="dialog-kicker">HOW IT WORKS</p>
       <h2 id="help-title">两个人，同一部电影，同一秒。</h2>
       <ol class="help-steps">
-        <li><span>01</span><div><strong>各自选择同一部本地视频</strong><p>你们需要在各自设备上准备好同一个文件。影片不会上传或转码。</p></div></li>
+        <li><span>01</span><div><strong>各自载入同一部片</strong><p>你们可以在各自设备上打开同一个本地文件，或者粘贴同一个视频链接。影片不会上传或转码。</p></div></li>
         <li><span>02</span><div><strong>片源自动核对</strong><p>同频会比对文件指纹与时长。确认一致后，同步会更可靠。</p></div></li>
         <li><span>03</span><div><strong>任意一方操作，双方同步</strong><p>播放、暂停、拖动进度都会实时同步；每 3 秒还会自动检测并校准偏差。</p></div></li>
       </ol>
@@ -412,7 +447,7 @@
     </section>
   </div>
 
-  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <div class="toast-region" id="toast-region" aria-live="polite" data-i18n-skip></div>
   <script src="/js/room.js" defer></script>
 </body>
 </html>
