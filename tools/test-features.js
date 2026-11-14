@@ -66,7 +66,11 @@ function startMediaServer() {
   for (const [label, page] of [['A', pageA], ['B', pageB]]) {
     page.on('pageerror', (error) => errors.push(`${label} pageerror: ${error.message}\n${error.stack || ''}`));
     page.on('console', (message) => {
-      if (message.type() === 'error') errors.push(`${label} console: ${message.text()}`);
+      if (message.type() !== 'error') return;
+      const text = message.text();
+      // 第三方内嵌播放器自身的日志不算本站问题
+      if (/bilibili|bili-user-fingerprint|player\.bilibili\.com|youtube\.com/i.test(text)) return;
+      errors.push(`${label} console: ${text}`);
     });
   }
 
@@ -114,11 +118,23 @@ function startMediaServer() {
     await sleep(200);
     check('invalid link rejected', /http/i.test(await pageA.locator('#source-error').innerText()), await pageA.locator('#source-error').innerText());
 
-    await pageA.fill('#source-url', 'https://www.youtube.com/watch?v=abc123');
-    await pageA.click('#source-submit');
-    await sleep(200);
-    const pageError = await pageA.locator('#source-error').innerText();
-    check('web page link rejected', pageError.length > 0 && !/http/i.test(pageError), pageError);
+    await pageA.fill('#source-url', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+    await sleep(250);
+    check('youtube link detected', /YouTube/.test(await pageA.locator('#source-platform').innerText()), await pageA.locator('#source-platform').innerText());
+
+    await pageA.fill('#source-url', 'https://www.bilibili.com/video/BV1B7411m7LV');
+    await sleep(250);
+    check('bilibili link detected', /Bilibili/.test(await pageA.locator('#source-platform').innerText()), await pageA.locator('#source-platform').innerText());
+
+    await pageA.fill('#source-url', 'https://www.netflix.com/watch/80100172');
+    await sleep(250);
+    const unsupported = await pageA.locator('#source-platform').innerText();
+    check('unsupported DRM platform flagged', /DRM/i.test(unsupported), unsupported);
+
+    await pageA.fill('#source-url', 'https://www.douyin.com/video/7123456789012345678');
+    await sleep(250);
+    const pageHint = await pageA.locator('#source-platform').innerText();
+    check('non-DRM page hint mentions server parsing', /解析|stream/i.test(pageHint), pageHint);
 
     /* ---------- 通过链接载入片源 ---------- */
     await pageA.fill('#source-url', mediaUrl);
@@ -164,6 +180,48 @@ function startMediaServer() {
     check('film state restored in Chinese', /在线/.test(await pageA.locator('#film-state').innerText()), await pageA.locator('#film-state').innerText());
 
     check('no browser errors', errors.length === 0, errors.join(' | '));
+
+    /* ---------- 平台嵌入 + 一起开始倒计时 ---------- */
+    await pageA.click('#replace-button');
+    await pageA.waitForSelector('#source-modal:not(.is-hidden)', { timeout: 5000 });
+    await pageA.fill('#source-url', 'https://www.bilibili.com/video/BV1B7411m7LV?p=1');
+    await pageA.click('#source-submit');
+    await pageA.waitForFunction(() => document.getElementById('embed-player').src.includes('player.bilibili.com'), { timeout: 15000 });
+    check('bilibili embed loaded', true);
+    check('native controls hidden for embed', await pageA.evaluate(() => document.getElementById('video-controls').classList.contains('is-hidden')));
+
+    const togetherLabel = await pageA.locator('#manual-sync strong').innerText();
+    check('manual sync becomes start together', /一起开始/.test(togetherLabel), togetherLabel);
+
+    await pageA.click('#manual-sync');
+    await pageA.waitForSelector('#countdown-card:not(.is-hidden)', { timeout: 5000 });
+    check('countdown shows on initiator', /[0-9]|▶/.test(await pageA.locator('#countdown-number').innerText()), await pageA.locator('#countdown-number').innerText());
+    await pageB.waitForSelector('#countdown-card:not(.is-hidden)', { timeout: 5000 });
+    check('peer also sees the countdown', true);
+    await sleep(4200);
+    check('countdown hides itself', await pageA.evaluate(() => document.getElementById('countdown-card').classList.contains('is-hidden')));
+    await pageA.screenshot({ path: path.join(SHOTS, 'room-embed.png'), fullPage: true });
+
+    /* ---------- YouTube 适配（依赖外网，失败只记录不抛出） ---------- */
+    await pageA.click('#replace-button');
+    await pageA.waitForSelector('#source-modal:not(.is-hidden)', { timeout: 5000 });
+    await pageA.fill('#source-url', 'https://www.youtube.com/watch?v=aqz-KE-bpKQ');
+    await pageA.click('#source-submit');
+    try {
+      await pageA.waitForFunction(
+        () => Boolean(document.querySelector('#yt-mount iframe')) || Boolean(document.querySelector('#embed-frame iframe[src*="youtube"]')),
+        { timeout: 20000 },
+      );
+      results.push({ name: 'youtube player mounts', pass: true, detail: '' });
+      await pageA.waitForFunction(() => document.getElementById('player').classList.contains('is-hidden'), { timeout: 5000 });
+      results.push({ name: 'native video hidden for youtube', pass: true, detail: '' });
+      await pageA.waitForFunction(() => document.getElementById('file-size').textContent.includes('YOUTUBE'), { timeout: 20000 });
+      results.push({ name: 'youtube source marked as ready', pass: true, detail: await pageA.locator('#film-subline').innerText() });
+      await sleep(2500);
+      await pageA.screenshot({ path: path.join(SHOTS, 'room-youtube.png'), fullPage: true });
+    } catch (error) {
+      results.push({ name: 'youtube player mounts', pass: false, detail: `skipped: ${error.message.split('\n')[0]}` });
+    }
 
     /* ---------- 自动语言识别与 ?lang= 覆盖 ---------- */
     const contextEn = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: 'en-US' });

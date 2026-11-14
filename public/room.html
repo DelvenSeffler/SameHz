@@ -89,6 +89,25 @@
       <div class="stage-frame" id="stage-frame">
         <video id="player" playsinline preload="metadata"></video>
 
+        <div class="embed-frame is-hidden" id="embed-frame">
+          <div id="yt-mount"></div>
+          <iframe
+            id="embed-player"
+            class="is-hidden"
+            title="Streaming player"
+            frameborder="0"
+            scrolling="no"
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+        </div>
+
+        <div class="countdown-card is-hidden" id="countdown-card">
+          <strong id="countdown-number">3</strong>
+          <span id="countdown-hint">一起按下播放</span>
+        </div>
+
         <div class="empty-state" id="empty-state">
           <div class="empty-inner">
             <div class="empty-reel" aria-hidden="true">
@@ -391,14 +410,15 @@
       </button>
       <p class="dialog-kicker">PLAY FROM THE INTERNET</p>
       <h2 id="source-title">载入在线视频</h2>
-      <p class="dialog-copy">粘贴一个可以直接播放的视频链接，比如 MP4、WebM 或 HLS（m3u8）。两个人粘贴同一个链接，就能同步观看。</p>
+      <p class="dialog-copy">粘贴视频网站链接，或直接粘贴视频文件链接。支持 YouTube、Bilibili、Vimeo 以及 MP4 / WebM / HLS 直链。</p>
       <form id="source-form">
         <label class="invite-link-field">
           <span>视频链接</span>
           <div>
-            <input id="source-url" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="例如：https://example.com/movie.mp4">
+            <input id="source-url" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="例如：https://www.youtube.com/watch?v=…">
           </div>
         </label>
+        <p class="source-platform" id="source-platform">支持 YouTube · Bilibili · Vimeo · 视频直链</p>
         <p class="entry-error" id="source-error" role="alert"></p>
         <div class="dialog-actions">
           <button class="dialog-primary" id="source-submit" type="submit">播放链接</button>
@@ -408,7 +428,7 @@
           </button>
         </div>
       </form>
-      <p class="dialog-footnote">支持 MP4 / WebM / HLS 直链；网页地址（如 YouTube）暂不支持。</p>
+      <p class="dialog-footnote">YouTube 支持完整同步；Bilibili 等平台只能嵌入播放，用「一起开始」倒计时对齐。</p>
     </section>
   </div>
 

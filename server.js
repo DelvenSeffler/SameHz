@@ -6,6 +6,7 @@ const path = require('node:path');
 const os = require('node:os');
 const crypto = require('node:crypto');
 const { WebSocketServer, WebSocket } = require('ws');
+const { resolvePage } = require('./lib/resolve');
 
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -98,7 +99,13 @@ function cleanSource(value) {
   if (String(value.kind) !== 'url') return { kind: 'local' };
   const url = String(value.url || '').trim();
   if (!/^https?:\/\//i.test(url) || url.length > 2000) return { kind: 'local' };
-  return { kind: 'url', url };
+  const platform = String(value.platform || '').toLowerCase();
+  const allowed = ['direct', 'youtube', 'bilibili', 'vimeo'];
+  return {
+    kind: 'url',
+    url,
+    platform: allowed.includes(platform) ? platform : 'direct',
+  };
 }
 
 function projectPosition(room, at = Date.now()) {
@@ -253,6 +260,21 @@ function handleResync(room, participant) {
   });
 }
 
+function handleTogether(room, participant, message) {
+  const now = Date.now();
+  room.lastActive = now;
+  const requested = Number(message.startAt);
+  const startAt = Number.isFinite(requested) && requested > now && requested < now + 20000
+    ? Math.round(requested)
+    : now + 3200;
+  broadcast(room, {
+    type: 'together',
+    startAt,
+    actor: { id: participant.id, name: participant.name },
+    serverTime: now,
+  });
+}
+
 function registerSocket(ws, room, participant, name) {
   const existing = room.participants.get(participant.id);
   if (existing && existing.ws && existing.ws !== ws) {
@@ -326,6 +348,7 @@ function registerSocket(ws, room, participant, name) {
     else if (message.type === 'file-meta') handleFileMeta(room, participant, message);
     else if (message.type === 'heartbeat') handleHeartbeat(room, participant, message);
     else if (message.type === 'request-sync') handleResync(room, participant);
+    else if (message.type === 'together') handleTogether(room, participant, message);
   });
 
   ws.on('close', () => {
@@ -411,6 +434,42 @@ function parseJsonBody(req, limitBytes = 8 * 1024) {
 }
 
 async function handleApi(req, res, pathname) {
+  if (req.method === 'POST' && pathname === '/api/resolve') {
+    const ip = String(req.socket.remoteAddress || 'unknown');
+    const now = Date.now();
+    const attempts = (createAttempts.get(`resolve:${ip}`) || []).filter((time) => now - time < 60 * 1000);
+    if (attempts.length >= 12) {
+      sendJson(res, 429, { ok: false, error: '解析得太频繁了，请稍后再试' });
+      return true;
+    }
+    attempts.push(now);
+    createAttempts.set(`resolve:${ip}`, attempts);
+
+    let body = {};
+    try {
+      body = await parseJsonBody(req);
+    } catch (error) {
+      sendJson(res, 400, { ok: false, error: error.message });
+      return true;
+    }
+
+    let target;
+    try {
+      target = new URL(String(body.url || '').trim());
+    } catch {
+      sendJson(res, 400, { ok: false, error: '链接格式不对' });
+      return true;
+    }
+    if (target.protocol !== 'http:' && target.protocol !== 'https:') {
+      sendJson(res, 400, { ok: false, error: '只支持 http / https 链接' });
+      return true;
+    }
+
+    const result = await resolvePage(target.href);
+    sendJson(res, result.ok ? 200 : 422, result);
+    return true;
+  }
+
   if (req.method === 'POST' && pathname === '/api/rooms') {
     const ip = String(req.socket.remoteAddress || 'unknown');
     const now = Date.now();
