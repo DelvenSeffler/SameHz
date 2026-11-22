@@ -1628,22 +1628,6 @@
     return match ? match[1] : '';
   }
 
-  function bilibiliInfo(parsed) {
-    const bv = parsed.pathname.match(/\/(BV[0-9A-Za-z]{8,})/);
-    if (bv) {
-      const page = parsed.searchParams.get('p') || '1';
-      return { query: `bvid=${bv[1]}&p=${Number(page) || 1}`, label: bv[1] };
-    }
-    const av = parsed.pathname.match(/\/av(\d+)/i);
-    if (av) {
-      const page = parsed.searchParams.get('p') || '1';
-      return { query: `aid=${av[1]}&p=${Number(page) || 1}`, label: `av${av[1]}` };
-    }
-    const queryBv = parsed.searchParams.get('bvid');
-    if (queryBv) return { query: `bvid=${queryBv}&p=1`, label: queryBv };
-    return null;
-  }
-
   function parsePlatformLink(raw) {
     const input = String(raw || '').trim();
     if (!input) return { error: t('请输入视频链接') };
@@ -1670,19 +1654,9 @@
       };
     }
 
-    if (host === 'b23.tv') {
-      return { error: t('b23.tv 短链无法直接识别，请先在浏览器打开，再复制完整的 Bilibili 视频链接。') };
-    }
-
-    if (/(^|\.)bilibili\.com$/.test(host)) {
-      const info = bilibiliInfo(parsed);
-      if (!info) return { error: t('没有识别出 Bilibili 视频号，请粘贴含 BV 号或 av 号的视频链接。') };
-      return {
-        platform: 'bilibili',
-        url,
-        label: info.label,
-        embedUrl: `https://player.bilibili.com/player.html?${info.query}&autoplay=0&danmaku=0&high_quality=1`,
-      };
+    // Bilibili（含 b23.tv 短链）：服务器解析出 mp4 直链，原生播放器完整同步
+    if (host === 'b23.tv' || /(^|\.)bilibili\.com$/.test(host)) {
+      return { platform: 'page', url };
     }
 
     if (/(^|\.)vimeo\.com$/.test(host)) {
@@ -2110,7 +2084,7 @@
     clearSourceError();
     destroyYouTubePlayer();
     if (isNativePlayer() && !dom.player.paused) dom.player.pause();
-    const platformName = parsed.platform === 'bilibili' ? 'Bilibili' : 'Vimeo';
+    const platformName = 'Vimeo';
     const name = parsed.label || platformName;
     dom.embedPlayer.src = parsed.embedUrl;
     applySourceState({
@@ -2215,7 +2189,7 @@
       return Promise.resolve(false);
     }
     if (parsed.platform === 'youtube') return loadYouTubeSource(parsed, options);
-    if (parsed.platform === 'bilibili' || parsed.platform === 'vimeo') return Promise.resolve(loadEmbedSource(parsed, options));
+    if (parsed.platform === 'vimeo') return Promise.resolve(loadEmbedSource(parsed, options));
     if (parsed.platform === 'page') return resolvePageSource(parsed, options);
     return loadDirectSource(parsed, options);
   }
@@ -2251,10 +2225,10 @@
 
   const PLATFORM_HINTS = {
     youtube: 'YouTube · 支持完整同步',
-    bilibili: 'Bilibili · 仅嵌入，用「一起开始」对齐',
+    bilibili: 'Bilibili · 解析直链，完整同步',
     vimeo: 'Vimeo · 仅嵌入，用「一起开始」对齐',
     direct: '视频直链 · 支持完整同步',
-    page: '网页视频 · 服务器尝试解析直链',
+    page: '网页视频 · 服务器解析直链后完整同步',
   };
 
   function updatePlatformHint() {

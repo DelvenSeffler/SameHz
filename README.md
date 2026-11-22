@@ -13,7 +13,7 @@
 ## 功能
 
 - 六位房间码 / 邀请链接，两人入座，无需注册
-- 三种片源：本地视频（MP4 / WebM / MOV 等）、在线直链（MP4 / WebM / HLS）、流媒体平台链接（YouTube 完整同步；Bilibili / Vimeo 嵌入播放）
+- 三种片源：本地视频（MP4 / WebM / MOV 等）、在线直链（MP4 / WebM / HLS）、流媒体平台链接（YouTube、Bilibili 完整同步；Vimeo 嵌入播放）
 - 粘贴其他视频网站页面链接时，服务器会尝试解析出可直接播放的流地址
 - 一方粘贴链接后，另一方会自动载入同一条链接
 - 「一起开始」倒计时，让无法程序化控制的平台也能同时起播
@@ -32,9 +32,9 @@
 
 ![YouTube 同步](docs/preview-room-youtube.png)
 
-Bilibili 等平台以嵌入播放 +「一起开始」倒计时对齐：
+Bilibili 链接同样完整同步（服务器解析直链，浏览器直连 CDN）：
 
-![Bilibili 嵌入](docs/preview-room-bilibili.png)
+![Bilibili 同步](docs/preview-room-bilibili.png)
 
 英文界面：
 
@@ -106,7 +106,8 @@ npm start
 | --- | --- | --- |
 | 视频直链 | `https://cdn.example.com/movie.mp4`、`.webm`、`.m3u8`（HLS） | 完整同步：播放、暂停、跳转、自动校准 |
 | YouTube | `https://www.youtube.com/watch?v=…`、`youtu.be/…`、Short（Shorts） | 完整同步：通过官方 IFrame API 控制并读取进度 |
-| Bilibili / Vimeo | `https://www.bilibili.com/video/BV…`、`https://vimeo.com/…` | **仅嵌入**：平台未提供可控接口，使用「一起开始」倒计时同时按下播放 |
+| Bilibili | `https://www.bilibili.com/video/BV…`（含 `b23.tv` 短链、av 号、多 P） | 完整同步：服务器经 html5 接口解析出免 Referer 的 mp4 直链，浏览器直接播放（清晰度上限 720p，为免登录接口的固有限制） |
+| Vimeo | `https://vimeo.com/…` | **仅嵌入**：平台未提供可控接口，使用「一起开始」倒计时同时按下播放 |
 | 其他视频网站页面 | 例如 `https://example.com/video/12345` | 服务器尝试解析出直链（见下），成功后按直链完整同步 |
 
 ### 网页视频解析（方案 A：只解析，不代理）
@@ -199,7 +200,9 @@ npm run test:e2e
 - 浏览器能否播放取决于文件编码，推荐 MP4（H.264 + AAC）或 WebM（VP8/VP9）。
 - HLS 链接依赖 CDN 上的 hls.js；若该 CDN 被阻断，`.m3u8` 将无法播放，MP4 / WebM 直链不受影响。
 - YouTube 依赖官方 IFrame API（`youtube.com/iframe_api`）与可嵌入的视频；地区限制、版权限制、禁止嵌入的视频无法播放。
-- Bilibili / Vimeo 只能嵌入，无法读取或控制播放进度，因此用「一起开始」倒计时对齐，不做自动校准。
+- Bilibili 解析走 B站官方 html5 接口：服务器只调用两次 JSON API（合计约 20KB 元数据），拿到 mp4 直链后由**浏览器直连 B站 CDN** 播放，视频流量不经过本站服务器。
+- Bilibili 免登录接口清晰度上限 720p，且不含弹幕；需要更高清晰度时可双方换用本地文件。
+- Vimeo 只能嵌入，无法读取或控制播放进度，因此用「一起开始」倒计时对齐，不做自动校准。
 - 网页解析依赖外网可达与 yt-dlp；Render 免费层出站带宽有限，但因为**只解析不代理**，只有解析时的 HTML 请求会计入。
 - 受 DRM 保护的平台（Netflix、Disney+、爱奇艺、优酷等）无法支持，浏览器不允许第三方控制其播放器。
 - 房间最多两人，这是产品设定；离开后空位保留约 12 秒以便刷新重连。

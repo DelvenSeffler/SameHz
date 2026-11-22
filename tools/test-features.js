@@ -124,7 +124,11 @@ function startMediaServer() {
 
     await pageA.fill('#source-url', 'https://www.bilibili.com/video/BV1B7411m7LV');
     await sleep(250);
-    check('bilibili link detected', /Bilibili/.test(await pageA.locator('#source-platform').innerText()), await pageA.locator('#source-platform').innerText());
+    check('bilibili routes to full sync', /解析直链/.test(await pageA.locator('#source-platform').innerText()), await pageA.locator('#source-platform').innerText());
+
+    await pageA.fill('#source-url', 'https://b23.tv/abc123');
+    await sleep(250);
+    check('b23 short link accepted', /解析直链|http/i.test(await pageA.locator('#source-platform').innerText()), await pageA.locator('#source-platform').innerText());
 
     await pageA.fill('#source-url', 'https://www.netflix.com/watch/80100172');
     await sleep(250);
@@ -181,26 +185,58 @@ function startMediaServer() {
 
     check('no browser errors', errors.length === 0, errors.join(' | '));
 
-    /* ---------- 平台嵌入 + 一起开始倒计时 ---------- */
-    await pageA.click('#replace-button');
-    await pageA.waitForSelector('#source-modal:not(.is-hidden)', { timeout: 5000 });
-    await pageA.fill('#source-url', 'https://www.bilibili.com/video/BV1B7411m7LV?p=1');
-    await pageA.click('#source-submit');
-    await pageA.waitForFunction(() => document.getElementById('embed-player').src.includes('player.bilibili.com'), { timeout: 15000 });
-    check('bilibili embed loaded', true);
-    check('native controls hidden for embed', await pageA.evaluate(() => document.getElementById('video-controls').classList.contains('is-hidden')));
+    /* ---------- Bilibili 直链完整同步（新房间，依赖外网） ---------- */
+    const ctxAB = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: 'zh-CN' });
+    const ctxBB = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: 'zh-CN' });
+    const pageAB = await ctxAB.newPage();
+    const pageBB = await ctxBB.newPage();
+    for (const [label, page] of [['AB', pageAB], ['BB', pageBB]]) {
+      page.on('pageerror', (error) => errors.push(`${label} pageerror: ${error.message}`));
+    }
+    try {
+      await pageAB.goto(BASE, { waitUntil: 'networkidle' });
+      await pageAB.fill('#nickname', '甲');
+      await pageAB.click('#submit-button');
+      await pageAB.waitForURL(/\/room\/[A-Z0-9]{6}$/, { timeout: 10000 });
+      const biliRoom = pageAB.url().split('/').pop();
+      await pageAB.waitForSelector('#connection-pill:not(.is-connecting)', { timeout: 10000 });
+      await pageBB.goto(`${BASE}/room/${biliRoom}`, { waitUntil: 'domcontentloaded' });
+      await pageBB.waitForSelector('#entry-overlay:not(.is-hidden)');
+      await pageBB.fill('#entry-name', '乙');
+      await pageBB.click('#entry-submit');
+      await pageBB.waitForSelector('#entry-overlay.is-hidden', { state: 'hidden', timeout: 8000 });
 
-    const togetherLabel = await pageA.locator('#manual-sync strong').innerText();
-    check('manual sync becomes start together', /一起开始/.test(togetherLabel), togetherLabel);
+      await pageAB.click('#url-open');
+      await pageAB.waitForSelector('#source-modal:not(.is-hidden)', { timeout: 5000 });
+      await pageAB.fill('#source-url', 'https://www.bilibili.com/video/BV1B7411m7LV');
+      await sleep(250);
+      check('bilibili link routes to server resolve', /解析直链/.test(await pageAB.locator('#source-platform').innerText()), await pageAB.locator('#source-platform').innerText());
+      await pageAB.click('#source-submit');
 
-    await pageA.click('#manual-sync');
-    await pageA.waitForSelector('#countdown-card:not(.is-hidden)', { timeout: 5000 });
-    check('countdown shows on initiator', /[0-9]|▶/.test(await pageA.locator('#countdown-number').innerText()), await pageA.locator('#countdown-number').innerText());
-    await pageB.waitForSelector('#countdown-card:not(.is-hidden)', { timeout: 5000 });
-    check('peer also sees the countdown', true);
-    await sleep(4200);
-    check('countdown hides itself', await pageA.evaluate(() => document.getElementById('countdown-card').classList.contains('is-hidden')));
-    await pageA.screenshot({ path: path.join(SHOTS, 'room-embed.png'), fullPage: true });
+      await pageAB.waitForFunction(() => document.getElementById('player').currentSrc.includes('upos-') || document.getElementById('player').currentSrc.includes('.mp4'), { timeout: 30000 });
+      check('bilibili mp4 plays in native player', true);
+      const metaA = await pageAB.evaluate(() => ({ dur: document.getElementById('player').duration, title: document.getElementById('film-title').textContent }));
+      check('bilibili title from API', metaA.title.includes('四月') || metaA.title.length > 2, JSON.stringify(metaA));
+      check('bilibili duration real', Number.isFinite(metaA.dur) && metaA.dur > 60, String(metaA.dur));
+
+      await pageBB.waitForFunction(() => document.getElementById('player').currentSrc.includes('upos-') || document.getElementById('player').currentSrc.includes('.mp4'), { timeout: 40000 });
+      check('peer auto-adopted bilibili stream', true);
+
+      await pageAB.click('#play-button');
+      await sleep(2800);
+      const bilisync = await Promise.all([pageAB, pageBB].map((page) => page.evaluate(() => ({
+        paused: document.getElementById('player').paused,
+        time: document.getElementById('player').currentTime,
+      }))));
+      check('bilibili play syncs', bilisync.every((item) => !item.paused), JSON.stringify(bilisync));
+      check('bilibili drift is low', Math.abs(bilisync[0].time - bilisync[1].time) < 1.5, JSON.stringify(bilisync));
+      await pageAB.screenshot({ path: path.join(SHOTS, 'room-bilibili.png'), fullPage: true });
+    } catch (error) {
+      check('bilibili mp4 plays in native player', false, `skipped: ${error.message.split('\n')[0]}`);
+    } finally {
+      await ctxAB.close();
+      await ctxBB.close();
+    }
 
     /* ---------- YouTube 适配（依赖外网，失败只记录不抛出） ---------- */
     await pageA.click('#replace-button');

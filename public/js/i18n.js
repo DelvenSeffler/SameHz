@@ -301,7 +301,9 @@
     'Bilibili · 仅嵌入，用「一起开始」对齐': 'Bilibili · embed only, align with “Start together”',
     'Vimeo · 仅嵌入，用「一起开始」对齐': 'Vimeo · embed only, align with “Start together”',
     '视频直链 · 支持完整同步': 'Direct link · full sync',
-    '网页视频 · 服务器尝试解析直链': 'Web page · server will try to find a stream',
+    '网页视频 · 服务器解析直链后完整同步': 'Web page · server finds the stream, then full sync',
+    'YouTube 与 Bilibili 支持完整同步；Vimeo 嵌入播放。解析清晰度以源站免登录上限为准。':
+      'YouTube and Bilibili sync fully; Vimeo is embed-only. Resolution is capped by the source site.',
     '正在解析网页里的视频…': 'Looking for a video stream in that page…',
     '没能解析这个网页里的视频，可以换一个来源或使用直链。':
       'No video stream found in that page. Try another source or a direct link.',
