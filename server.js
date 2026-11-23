@@ -7,6 +7,7 @@ const os = require('node:os');
 const crypto = require('node:crypto');
 const { WebSocketServer, WebSocket } = require('ws');
 const { resolvePage } = require('./lib/resolve');
+const stats = require('./lib/analytics');
 
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -205,6 +206,9 @@ function handleControl(room, participant, message) {
   };
   room.lastActive = now;
 
+  if (action === 'play') stats.trackPlay(room.id);
+  if (playing) stats.trackProgress(room.id, position);
+
   broadcast(room, {
     type: 'state',
     state: room.state,
@@ -220,6 +224,7 @@ function handleFileMeta(room, participant, message) {
   participant.file = file;
   refreshRoomDuration(room);
   room.lastActive = Date.now();
+  stats.trackSource(room.id, file.source && file.source.platform ? file.source.platform : 'local');
   broadcastParticipants(room);
   broadcast(room, {
     type: 'file-ready',
@@ -434,6 +439,33 @@ function parseJsonBody(req, limitBytes = 8 * 1024) {
 }
 
 async function handleApi(req, res, pathname) {
+  if (req.method === 'POST' && pathname === '/api/track') {
+    let body = {};
+    try {
+      body = await parseJsonBody(req, 2 * 1024);
+    } catch {
+      sendJson(res, 204, {});
+      return true;
+    }
+    const event = String(body.event || '').replace(/[^a-z0-9_-]/gi, '').slice(0, 40);
+    if (event) {
+      const allowed = ['invite_copied', 'invite_shared', 'source_modal_opened', 'landing_view'];
+      if (allowed.includes(event)) stats.track(event);
+    }
+    sendJson(res, 204, {});
+    return true;
+  }
+
+  if (req.method === 'GET' && pathname === '/api/stats') {
+    const token = process.env.STATS_TOKEN;
+    if (token && String(req.headers['x-stats-token'] || '') !== token) {
+      sendJson(res, 401, { error: '需要统计口令' });
+      return true;
+    }
+    sendJson(res, 200, stats.snapshot());
+    return true;
+  }
+
   if (req.method === 'POST' && pathname === '/api/resolve') {
     const ip = String(req.socket.remoteAddress || 'unknown');
     const now = Date.now();
@@ -489,6 +521,7 @@ async function handleApi(req, res, pathname) {
       return true;
     }
     const room = createRoom();
+    stats.trackRoomCreated(room.id);
     sendJson(res, 201, {
       roomId: room.id,
       roomUrl: `/room/${room.id}`,
@@ -595,6 +628,11 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (pathname === '/stats' || pathname === '/stats/') {
+    serveFile(req, res, path.join(PUBLIC_DIR, 'stats.html'));
+    return;
+  }
+
   if (/^\/room\/[A-Za-z0-9]{6}\/?$/.test(pathname)) {
     serveFile(req, res, path.join(PUBLIC_DIR, 'room.html'));
     return;
@@ -652,6 +690,7 @@ server.on('upgrade', (req, socket, head) => {
         disconnectTimer: null,
       };
       room.participants.set(clientId, participant);
+      stats.trackJoin(room.id);
     }
 
     registerSocket(ws, room, participant, name);

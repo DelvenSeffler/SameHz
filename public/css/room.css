@@ -3305,3 +3305,35 @@ body.modal-open {
 .room-brand .brand-word small {
   letter-spacing: 0.14em;
 }
+
+/* ---------- 邀请海报按钮 ---------- */
+
+.dialog-poster-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 42px;
+  margin-top: 9px;
+  border: 1px dashed rgba(255, 138, 107, 0.45);
+  border-radius: 7px;
+  background: rgba(255, 138, 107, 0.06);
+  color: var(--ink-soft);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.dialog-poster-button .icon {
+  width: 15px;
+  height: 15px;
+  color: var(--gold);
+}
+
+.dialog-poster-button:hover {
+  color: var(--ink);
+  border-color: rgba(255, 138, 107, 0.75);
+  background: rgba(255, 138, 107, 0.12);
+}

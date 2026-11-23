@@ -119,6 +119,7 @@
     dialogCopyLink: $('dialog-copy-link'),
     dialogCopyCode: $('dialog-copy-code'),
     dialogShare: $('dialog-share'),
+    dialogPoster: $('dialog-poster'),
     toastRegion: $('toast-region'),
   };
 
@@ -440,12 +441,28 @@
     }
   }
 
+  function trackEvent(event) {
+    try {
+      const payload = JSON.stringify({ event });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }));
+        return;
+      }
+      fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true })
+        .catch(() => {});
+    } catch {
+      // 统计失败不影响使用
+    }
+  }
+
   async function copyWithFeedback(text, label) {
     const ok = await copyText(text);
+    if (ok) trackEvent('invite_copied');
     toast(ok ? (label || t('已复制')) : t('复制失败，请手动选择复制'), ok ? 'success' : 'error');
   }
 
   async function shareInvite() {
+    trackEvent('invite_shared');
     const shareData = {
       title: t('同频 · 私人放映室'),
       text: t('来和我一起看电影吧，房间码 {code}', { code: ROOM_ID }),
@@ -465,6 +482,71 @@
   function populateInviteDialog() {
     dom.inviteLinkInput.value = roomUrl;
     dom.dialogRoomCode.textContent = ROOM_ID;
+  }
+
+  /* ---------------- 邀请海报 ---------------- */
+
+  async function savePoster() {
+    const poster = window.SameHzPoster;
+    if (!poster) {
+      toast(t('海报功能没有加载成功，请刷新页面再试'), 'error');
+      return;
+    }
+    const label = dom.dialogPoster && dom.dialogPoster.querySelector('span');
+    if (label) label.textContent = t('正在生成海报…');
+
+    try {
+      const canvas = poster.draw({
+        roomId: ROOM_ID,
+        url: roomUrl,
+        hostHint: t('打开 {host} 输入房间码', { host: location.host }),
+        name: state.selfName,
+        headline: t('今晚，一起看场电影。'),
+        copy: t('各自放自己的片源，播放进度实时对齐。'),
+        points: [t('原画质不压缩'), t('每 3 秒自动对齐'), t('影片不上传')],
+      });
+      const blob = await poster.toBlob(canvas);
+
+      // 移动端优先走系统分享（可直接发微信），桌面端直接下载。
+      // canShare 为 true 不代表 share 一定可用（部分环境会静默挂起），
+      // 因此加超时兜底：超过 2.5 秒没有结果就回退为下载。
+      const file = new File([blob], `samehz-${ROOM_ID}.png`, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await Promise.race([
+            navigator.share({
+              files: [file],
+              title: t('同频 · 私人放映室'),
+              text: t('来和我一起看电影吧，房间码 {code}', { code: ROOM_ID }),
+            }),
+            new Promise((_, reject) => {
+              window.setTimeout(() => reject(new Error('share-timeout')), 2500);
+            }),
+          ]);
+          trackEvent('invite_shared');
+          toast(t('海报已生成，发朋友圈或群里吧'), 'success', 3600);
+          return;
+        } catch (error) {
+          if (error && error.name === 'AbortError') return;
+          // 超时或被拒绝：继续走下载
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `samehz-${ROOM_ID}.png`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 8000);
+      trackEvent('invite_shared');
+      toast(t('海报已生成，发朋友圈或群里吧'), 'success', 3600);
+    } catch {
+      toast(t('海报生成失败，请重试'), 'error');
+    } finally {
+      if (label) label.textContent = t('生成邀请海报（可直接发朋友圈）');
+    }
   }
 
   /* ---------------- UI rendering ---------------- */
@@ -2622,6 +2704,7 @@
     dom.dialogCopyLink.addEventListener('click', () => copyWithFeedback(roomUrl, t('邀请链接已复制')));
     dom.dialogCopyCode.addEventListener('click', () => copyWithFeedback(ROOM_ID, t('房间码已复制')));
     dom.dialogShare.addEventListener('click', shareInvite);
+    dom.dialogPoster.addEventListener('click', savePoster);
     dom.helpButton.addEventListener('click', () => openModal(dom.helpModal));
 
     document.querySelectorAll('[data-close-modal]').forEach((button) => {

@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>同频 · 增长看板</title>
+  <style>
+    :root {
+      --bg: #0b0a09;
+      --panel: #161310;
+      --ink: #f7f1e6;
+      --muted: #aba295;
+      --line: rgba(244, 236, 223, 0.16);
+      --accent: #ff6a4d;
+      --green: #8fd3a4;
+      --warning: #e6b77d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px 24px 64px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; }
+    header { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 26px; }
+    h1 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
+    .stamp { color: var(--muted); font-size: 12.5px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: 12px; margin-bottom: 28px; }
+    .card { padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+    .card .label { color: var(--muted); font-size: 12px; letter-spacing: 0.02em; }
+    .card .value { margin-top: 5px; font-size: 27px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .card .value small { font-size: 13px; font-weight: 400; color: var(--muted); }
+    .card.star { border-color: rgba(255, 106, 77, 0.45); }
+    .card.star .value { color: var(--accent); }
+    h2 { margin: 30px 0 12px; font-size: 14px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+    th { color: var(--muted); font-weight: 500; font-size: 12.5px; }
+    td.num { font-variant-numeric: tabular-nums; text-align: right; }
+    .bar { position: relative; height: 7px; min-width: 90px; border-radius: 4px; background: rgba(255, 255, 255, 0.07); overflow: hidden; }
+    .bar i { position: absolute; inset: 0 auto 0 0; display: block; background: var(--accent); }
+    .empty { padding: 18px 0; color: var(--muted); }
+    .hint { margin-top: 26px; padding: 12px 14px; border-left: 2px solid var(--line); color: var(--muted); font-size: 12.5px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>同频 · 增长看板</h1>
+      <span class="stamp" id="stamp">读取中…</span>
+    </header>
+
+    <div class="grid">
+      <div class="card star">
+        <div class="label">今日真正用起来（≥10 分钟）</div>
+        <div class="value" id="activated">—</div>
+      </div>
+      <div class="card">
+        <div class="label">创建房间</div>
+        <div class="value" id="created">—</div>
+      </div>
+      <div class="card">
+        <div class="label">双方入座</div>
+        <div class="value" id="twoSeats">—</div>
+      </div>
+      <div class="card">
+        <div class="label">双方片源就绪</div>
+        <div class="value" id="bothSources">—</div>
+      </div>
+      <div class="card">
+        <div class="label">开始播放</div>
+        <div class="value" id="played">—</div>
+      </div>
+    </div>
+
+    <h2>转化漏斗</h2>
+    <table>
+      <thead><tr><th>环节</th><th class="num">房间数</th><th>相对上一步</th></tr></thead>
+      <tbody id="funnel"></tbody>
+    </table>
+
+    <h2>片源类型</h2>
+    <table>
+      <thead><tr><th>平台</th><th class="num">房间数</th></tr></thead>
+      <tbody id="platforms"></tbody>
+    </table>
+
+    <h2>事件计数</h2>
+    <table>
+      <thead><tr><th>事件</th><th class="num">次数</th></tr></thead>
+      <tbody id="events"></tbody>
+    </table>
+
+    <p class="hint">
+      北极星是「今日真正用起来」：双方入座、载入片源、并且一起播放超过 10 分钟的房间数。
+      如果访客多但这个数上不去，说明第一场体验有阻碍，先优化产品而不是继续投放。
+    </p>
+  </div>
+
+  <script>
+    (function () {
+      var token = null;
+      try { token = localStorage.getItem('tp:stats-token'); } catch (e) {}
+
+      function fmt(n) { return typeof n === 'number' ? n.toLocaleString('zh-CN') : '—'; }
+
+      function bar(percent) {
+        var wrap = document.createElement('div');
+        wrap.className = 'bar';
+        var fill = document.createElement('i');
+        fill.style.width = Math.max(0, Math.min(100, percent)) + '%';
+        wrap.appendChild(fill);
+        return wrap;
+      }
+
+      function row(label, value, percent) {
+        var tr = document.createElement('tr');
+        var th = document.createElement('td');
+        th.textContent = label;
+        var td = document.createElement('td');
+        td.className = 'num';
+        td.textContent = fmt(value);
+        var pc = document.createElement('td');
+        if (typeof percent === 'number') {
+          pc.appendChild(bar(percent));
+          var text = document.createElement('span');
+          text.style.marginLeft = '8px';
+          text.style.color = 'var(--muted)';
+          text.style.fontSize = '12px';
+          text.textContent = percent + '%';
+          pc.appendChild(text);
+        }
+        tr.appendChild(th);
+        tr.appendChild(td);
+        tr.appendChild(pc);
+        return tr;
+      }
+
+      function render(data) {
+        document.getElementById('stamp').textContent =
+          '统计日期 ' + data.day + ' · 更新于 ' + new Date(data.generatedAt).toLocaleTimeString('zh-CN', { hour12: false });
+
+        var f = data.funnel || {};
+        document.getElementById('activated').textContent = fmt(f.activated);
+        document.getElementById('created').textContent = fmt(f.created);
+        document.getElementById('twoSeats').textContent = fmt(f.twoSeats);
+        document.getElementById('bothSources').textContent = fmt(f.bothSources);
+        document.getElementById('played').textContent = fmt(f.played);
+
+        var funnelBody = document.getElementById('funnel');
+        funnelBody.replaceChildren(
+          row('创建房间', f.created, 100),
+          row('双方入座', f.twoSeats, f.seatRate),
+          row('双方片源就绪', f.bothSources, f.sourceRate),
+          row('开始播放', f.played, f.playRate),
+          row('播放 ≥10 分钟', f.activated, f.activationRate)
+        );
+
+        var platformBody = document.getElementById('platforms');
+        var platforms = Object.entries(data.platforms || {});
+        if (!platforms.length) {
+          var empty = document.createElement('tr');
+          var cell = document.createElement('td');
+          cell.colSpan = 2;
+          cell.className = 'empty';
+          cell.textContent = '今天还没有房间载入片源。';
+          empty.appendChild(cell);
+          platformBody.replaceChildren(empty);
+        } else {
+          platformBody.replaceChildren.apply(platformBody, platforms.map(function (entry) {
+            return row(entry[0], entry[1]);
+          }));
+        }
+
+        var eventBody = document.getElementById('events');
+        var events = Object.entries(data.events || {}).filter(function (entry) {
+          return entry[0].indexOf(':') === -1;
+        });
+        if (!events.length) {
+          var emptyEvent = document.createElement('tr');
+          var cellEvent = document.createElement('td');
+          cellEvent.colSpan = 2;
+          cellEvent.className = 'empty';
+          cellEvent.textContent = '今天还没有事件。';
+          emptyEvent.appendChild(cellEvent);
+          eventBody.replaceChildren(emptyEvent);
+        } else {
+          eventBody.replaceChildren.apply(eventBody, events.map(function (entry) {
+            return row(entry[0], entry[1]);
+          }));
+        }
+      }
+
+      function load() {
+        var headers = {};
+        if (token) headers['x-stats-token'] = token;
+        fetch('/api/stats', { headers: headers, cache: 'no-store' })
+          .then(function (response) {
+            if (response.status === 401) {
+              var input = window.prompt('输入统计口令');
+              if (input) {
+                try { localStorage.setItem('tp:stats-token', input); } catch (e) {}
+                token = input;
+                load();
+              }
+              return null;
+            }
+            return response.json();
+          })
+          .then(function (data) { if (data) render(data); })
+          .catch(function () {
+            document.getElementById('stamp').textContent = '读取失败，稍后重试';
+          });
+      }
+
+      load();
+      setInterval(load, 30000);
+    })();
+  </script>
+</body>
+</html>

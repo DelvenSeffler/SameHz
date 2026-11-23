@@ -40,6 +40,12 @@
     '等待同步': 'Waiting for sync',
     '进度已对齐': 'Progress aligned',
     '已复制': 'Copied',
+    '打开 {host} 输入房间码': 'Open {host} and enter the room code',
+    '生成邀请海报（可直接发朋友圈）': 'Create invite poster (ready to share)',
+    '正在生成海报…': 'Creating poster…',
+    '海报已生成，发朋友圈或群里吧': 'Poster ready — share it anywhere',
+    '海报生成失败，请重试': 'Could not create the poster, please retry',
+    '海报功能没有加载成功，请刷新页面再试': 'Poster feature failed to load — please refresh',
     '你': 'You',
     '同频 · 私人放映室': 'SameHz · Private screening room',
     '来和我一起看电影吧，房间码 {code}': "Come watch a film with me — room code {code}",
@@ -628,3 +634,4 @@
     wireToggles();
   }
 })();
+
