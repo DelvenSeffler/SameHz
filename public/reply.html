@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>同频 · 评论区话术生成器</title>
+  <style>
+    :root {
+      --bg: #0b0a09;
+      --panel: #161310;
+      --panel-2: #1c1815;
+      --ink: #f7f1e6;
+      --ink-soft: #e2dacc;
+      --muted: #aba295;
+      --line: rgba(244, 236, 223, 0.16);
+      --accent: #ff6a4d;
+      --accent-soft: #ff8166;
+      --green: #8fd3a4;
+      --warning: #e6b77d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 28px 20px 72px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .wrap { max-width: 900px; margin: 0 auto; }
+    h1 { margin: 0 0 6px; font-size: 21px; font-weight: 600; }
+    .lead { margin: 0 0 24px; color: var(--muted); font-size: 13px; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      margin-bottom: 16px;
+    }
+    label { display: block; }
+    label span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+    select, button { font-family: inherit; font-size: 13.5px; }
+    select {
+      width: 100%;
+      height: 38px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    select:focus { outline: none; border-color: rgba(255, 138, 107, 0.6); }
+
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
+    .btn {
+      height: 40px;
+      padding: 0 18px;
+      border-radius: 7px;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--ink-soft);
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    .btn:hover { color: var(--ink); border-color: rgba(244, 236, 223, 0.34); }
+    .btn.primary {
+      border-color: rgba(255, 138, 107, 0.55);
+      background: linear-gradient(135deg, rgba(255, 126, 97, 0.95), rgba(234, 84, 55, 0.95));
+      color: #1d0e08;
+      font-weight: 600;
+    }
+    .btn.primary:hover { filter: brightness(1.05); }
+
+    .result { display: flex; flex-direction: column; gap: 12px; }
+    .card {
+      position: relative;
+      padding: 16px 18px 44px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+    }
+    .card .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 11.5px;
+      letter-spacing: 0.04em;
+    }
+    .card .meta b { color: var(--green); font-weight: 600; }
+    .card p { margin: 0; white-space: pre-wrap; font-size: 14px; line-height: 1.75; }
+    .copy {
+      position: absolute;
+      right: 14px;
+      bottom: 12px;
+      height: 28px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .copy:hover { color: var(--ink); border-color: var(--line-strong); }
+    .copy.done { color: var(--green); border-color: rgba(143, 211, 164, 0.5); }
+
+    .rules {
+      margin-top: 26px;
+      padding: 16px 18px;
+      border-left: 2px solid rgba(230, 183, 125, 0.6);
+      background: rgba(230, 183, 125, 0.05);
+      border-radius: 0 8px 8px 0;
+    }
+    .rules h2 { margin: 0 0 10px; font-size: 13.5px; color: var(--warning); font-weight: 600; }
+    .rules ul { margin: 0; padding-left: 18px; color: var(--ink-soft); font-size: 13px; }
+    .rules li { margin-bottom: 6px; }
+    .empty { padding: 34px 0; text-align: center; color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>评论区话术生成器</h1>
+    <p class="lead">
+      针对「异地恋一起看电影」这类帖子生成像真人写的回复。每次生成 6 条不同变体，
+      复制后自己改一两个字再发——一字不改地重复发会被平台判成营销号。
+    </p>
+
+    <div class="controls">
+      <label>
+        <span>帖子场景</span>
+        <select id="scene">
+          <option value="screenShare">屏幕共享画质糊 / 卡顿</option>
+          <option value="howTo">异地恋怎么一起看电影</option>
+          <option value="bilibili">想同步看 B站 / 追番</option>
+          <option value="series">一起追剧、看综艺</option>
+          <option value="gift">异地恋仪式感、送什么</option>
+          <option value="tool">求推荐工具 / App</option>
+        </select>
+      </label>
+      <label>
+        <span>语气</span>
+        <select id="tone">
+          <option value="share">过来人分享（最稳）</option>
+          <option value="casual">轻描淡写（最不像广告）</option>
+          <option value="ask">求助式（反向引流）</option>
+        </select>
+      </label>
+      <label>
+        <span>平台</span>
+        <select id="platform">
+          <option value="xhs">小红书</option>
+          <option value="bili">B站</option>
+          <option value="douban">豆瓣</option>
+          <option value="tieba">贴吧</option>
+        </select>
+      </label>
+      <label>
+        <span>结尾方式</span>
+        <select id="closer">
+          <option value="mixed">自动搭配（推荐）</option>
+          <option value="name">只提名字</option>
+          <option value="link">带网址</option>
+          <option value="none">不提产品</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="generate">生成 6 条</button>
+      <button class="btn" id="regenerate">换一批</button>
+    </div>
+
+    <div class="result" id="result">
+      <p class="empty">选好场景，点「生成 6 条」。</p>
+    </div>
+
+    <div class="rules">
+      <h2>发之前必须遵守</h2>
+      <ul>
+        <li><b>只在真的相关的帖子下回复。</b>见帖就发链接，账号会被举报到封禁。</li>
+        <li><b>每条都改几个字。</b>同一段话复制粘贴超过 3 次，平台会识别为机器行为。</li>
+        <li><b>一天不超过 10 条。</b>新号更少，5 条以内。</li>
+        <li><b>7 成回复不要带链接。</b>只提名字，让人自己搜——反而更可信。</li>
+        <li><b>别用小号互相捧。</b>同一个 IP 的互评会被识别。</li>
+        <li><b>写完先自读一遍。</b>像不像人说话，你自己最清楚。</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var LINK = 'samehz.onrender.com';
+
+    var OPENERS = {
+      share: [
+        '我们异地两年，这个问题踩过所有的坑。',
+        '过来人说一句。',
+        '跟你一样的处境，试过好几种方式。',
+        '这个我太有发言权了。',
+        '我们也是异地，摸索了挺久。',
+        '看完评论区，说说我们的办法。',
+        '异地第三年，这方面算有点经验。',
+        '刚好我们上周还在聊这个。'
+      ],
+      casual: [
+        '啊这个我们也在用。',
+        '顺手提一句。',
+        '其实有个很轻的办法。',
+        '我们现在的做法是——',
+        '碰巧前两天刚聊到这个。',
+        '无意中看到这帖，说一下。',
+        '可能有点偏题，但挺有用。',
+        '我们换了种方式之后好多了。'
+      ],
+      ask: [
+        '有没有人也遇到这个情况……',
+        '一直想问，大家异地都是怎么解决的？',
+        '我先说我现在的做法，看有没有更好的。',
+        '求个同款，顺便分享下我们用的。',
+        '蹲一个，同时说下我们的方案。',
+        '同问，我们的解法是这样的。',
+        '有人试过不共享画面吗？',
+        '我们试出来一个还行的办法。'
+      ]
+    };
+
+    var MIDDLES = {
+      screenShare: [
+        '屏幕共享最大的问题是压缩，画质糊到看不清演员表情，声音还经常卡成电音。',
+        '屏幕共享看着方便，但对方那边是压缩过的画面，一部电影下来眼睛很累。',
+        '共享出来的音频会二次编码，两个人再对着麦克风说话，基本听不清台词。',
+        '我们之前共享的时候，她那边经常缓冲，一个镜头卡三次，最后干脆聊了半小时天。',
+        '共享还特别吃 CPU，我这边风扇转得像起飞，画质反而更低。',
+        '两个人网速不一样的时候最惨，慢的那个一直拖着快的。'
+      ],
+      howTo: [
+        '后来改成各自在本地放同一部电影，只同步播放进度——她按暂停我这边也停。',
+        '现在的做法是各看各的文件，中间只传一个「第几秒」，画质是原片。',
+        '关键思路是：不传视频，只传进度。这样不压缩也不卡。',
+        '我们不再共享画面了，改成两个人放同一个片源，进度对齐就行。',
+        '找了半天发现市面上有专门做这件事的小工具，比硬凑方便。',
+        '最简单的判断标准：谁都不用牺牲画质，就对了。'
+      ],
+      bilibili: [
+        'B站现在也能同步了，粘贴同一个链接，两个人进度一致。',
+        '我们追番是用链接同步的，谁按暂停另一边也停。',
+        '番剧的话直接贴 B站链接就行，不用两个人掐着秒表按播放。',
+        '以前只能看本地文件，现在贴链接也能一起看，方便很多。',
+        'B站的视频不用下载，贴上去两边都能放。',
+        '大会员内容还是得自己有会员，但普通视频没问题。'
+      ],
+      series: [
+        '追剧最麻烦的是「你看到第几集了」，我们现在进度是共用的。',
+        '综艺和短剧也适用，一集二十分钟，看完各自睡。',
+        '日更的剧特别需要这个，不然第二天就有人剧透。',
+        '我们约定一次只看到同一集，谁先偷看谁请喝奶茶。',
+        '进度同步之后，讨论剧情终于在同一频道上了。',
+        '一周两集的那种，看完刚好能聊四十分钟。'
+      ],
+      gift: [
+        '与其送礼物，不如固定一个「一起看电影」的时间，比什么都管用。',
+        '我们的仪式感就是每周三晚上十一点半，雷打不动看一部片。',
+        '异地最缺的不是礼物，是「同时在场」的感觉。',
+        '试过送东西，但真正留住的是那些「说好一起做」的小事。',
+        '把电影夜做成固定日程，比突发的惊喜更持久。',
+        '有时候什么都不用说，一起安静看完两小时就够了。'
+      ],
+      tool: [
+        '试过好几个，最后留下的是个只同步进度的小网站。',
+        '不需要装软件，浏览器打开就行，两个人都放自己的片源。',
+        '功能很单一，就干一件事：让两个人的进度一致。',
+        '我比较怕那种功能一大堆的，最后能坚持用的都是极简的。',
+        '打开网页就能用，连注册都不用，这点很省心。',
+        '对网络要求不高，我们两个网速差挺多也没问题。'
+      ]
+    };
+
+    var DETAILS = [
+      '偏差超过 0.85 秒会自动拉回来，不用手动对。',
+      '拖动进度、暂停、继续，全都是实时同步的。',
+      '它不存片也不传片，所以理论上什么画质就是什么画质。',
+      '手机电脑都能用，她那台旧笔记本也不卡。',
+      '每 3 秒自动核对一次，误差基本在 0.0x 秒。',
+      '免费，也没有广告弹窗。',
+      '支持本地文件，也支持贴链接（B站、YouTube、mp4 都行）。'
+    ];
+
+    var CLOSERS = {
+      name: [
+        '搜 samehz 就有。',
+        '叫同频，搜得到。',
+        '名字是 samehz，自己搜吧。',
+        '搜「同频」试试。'
+      ],
+      link: [
+        '地址是 ' + LINK + '。',
+        LINK + ' 这个，免费的。',
+        '直接开 ' + LINK + ' 就行。'
+      ],
+      none: [
+        '',
+        '',
+        '你们也可以试试类似的做法。',
+        '反正核心就是别传画面，只传进度。'
+      ]
+    };
+
+    var EMOJI = {
+      xhs: ['', '', '🥲', '🎬', ' ', ''],
+      bili: ['', '', '', ' ', '', ''],
+      douban: ['', '', '', '', '', ''],
+      tieba: ['', '', '', '', '', '']
+    };
+
+    function pick(list, used) {
+      var pool = list.filter(function (item) { return used.indexOf(item) === -1; });
+      if (!pool.length) pool = list.slice();
+      var value = pool[Math.floor(Math.random() * pool.length)];
+      if (used.indexOf(value) === -1) used.push(value);
+      return value;
+    }
+
+    function join(platform, parts) {
+      var text = parts.filter(Boolean).join('');
+      if (platform === 'xhs') {
+        // 小红书：短段落 + 空行，读起来不累
+        return text
+          .replace(/。([^。])/g, '。\n$1')
+          .replace(/\n{2,}/g, '\n')
+          .replace(/\n$/, '');
+      }
+      if (platform === 'bili' || platform === 'douban') {
+        return text;
+      }
+      return text.replace(/\n/g, ' ');
+    }
+
+    function buildOne(scene, tone, platform, closerMode, used) {
+      var opener = pick(OPENERS[tone], used.openers);
+      var middle = pick(MIDDLES[scene], used.middles);
+      var detail = Math.random() < 0.72 ? pick(DETAILS, used.details) : '';
+      var closerKey = closerMode;
+      if (closerMode === 'mixed') {
+        closerKey = ['name', 'name', 'link', 'none'][Math.floor(Math.random() * 4)];
+      }
+      var closer = pick(CLOSERS[closerKey], used.closers);
+      var emoji = pick(EMOJI[platform] || [''], []);
+      return join(platform, [opener, middle, detail, closer]) + emoji;
+    }
+
+    function generate() {
+      var scene = document.getElementById('scene').value;
+      var tone = document.getElementById('tone').value;
+      var platform = document.getElementById('platform').value;
+      var closerMode = document.getElementById('closer').value;
+
+      var used = { openers: [], middles: [], details: [], closers: [] };
+      var items = [];
+      for (var i = 0; i < 6; i += 1) {
+        items.push(buildOne(scene, tone, platform, closerMode, used));
+      }
+
+      var result = document.getElementById('result');
+      result.replaceChildren.apply(result, items.map(function (text, index) {
+        var card = document.createElement('div');
+        card.className = 'card';
+
+        var meta = document.createElement('div');
+        meta.className = 'meta';
+        var indexLabel = document.createElement('span');
+        indexLabel.textContent = '变体 ' + (index + 1);
+        var lengthLabel = document.createElement('b');
+        lengthLabel.textContent = text.length + ' 字';
+        meta.appendChild(indexLabel);
+        meta.appendChild(lengthLabel);
+
+        var paragraph = document.createElement('p');
+        paragraph.textContent = text;
+
+        var button = document.createElement('button');
+        button.className = 'copy';
+        button.type = 'button';
+        button.textContent = '复制';
+        button.addEventListener('click', function () {
+          copy(text).then(function (ok) {
+            button.textContent = ok ? '已复制' : '复制失败';
+            button.classList.toggle('done', ok);
+            setTimeout(function () {
+              button.textContent = '复制';
+              button.classList.remove('done');
+            }, 1800);
+          });
+        });
+
+        card.appendChild(meta);
+        card.appendChild(paragraph);
+        card.appendChild(button);
+        return card;
+      }));
+    }
+
+    function copy(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text).then(function () { return true; }).catch(function () { return legacy(text); });
+      }
+      return Promise.resolve(legacy(text));
+    }
+
+    function legacy(text) {
+      try {
+        var area = document.createElement('textarea');
+        area.value = text;
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        var ok = document.execCommand('copy');
+        area.remove();
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    document.getElementById('generate').addEventListener('click', generate);
+    document.getElementById('regenerate').addEventListener('click', generate);
+    generate();
+  })();
+  </script>
+</body>
+</html>

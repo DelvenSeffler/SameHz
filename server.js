@@ -633,6 +633,11 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (pathname === '/reply' || pathname === '/reply/') {
+    serveFile(req, res, path.join(PUBLIC_DIR, 'reply.html'));
+    return;
+  }
+
   if (/^\/room\/[A-Za-z0-9]{6}\/?$/.test(pathname)) {
     serveFile(req, res, path.join(PUBLIC_DIR, 'room.html'));
     return;
