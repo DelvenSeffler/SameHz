@@ -15,7 +15,6 @@
       --muted: #aba295;
       --line: rgba(244, 236, 223, 0.16);
       --accent: #ff6a4d;
-      --accent-soft: #ff8166;
       --green: #8fd3a4;
       --warning: #e6b77d;
     }
@@ -31,17 +30,18 @@
     }
     .wrap { max-width: 900px; margin: 0 auto; }
     h1 { margin: 0 0 6px; font-size: 21px; font-weight: 600; }
-    .lead { margin: 0 0 24px; color: var(--muted); font-size: 13px; }
+    .lead { margin: 0 0 22px; color: var(--muted); font-size: 13px; }
+    .lead b { color: var(--green); font-weight: 600; }
 
     .controls {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       gap: 12px;
       padding: 16px;
       border: 1px solid var(--line);
       border-radius: 10px;
       background: var(--panel);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     label { display: block; }
     label span {
@@ -49,7 +49,6 @@
       margin-bottom: 6px;
       color: var(--muted);
       font-size: 12px;
-      letter-spacing: 0.02em;
     }
     select, button { font-family: inherit; font-size: 13.5px; }
     select {
@@ -64,7 +63,7 @@
     }
     select:focus { outline: none; border-color: rgba(255, 138, 107, 0.6); }
 
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
     .btn {
       height: 40px;
       padding: 0 18px;
@@ -129,15 +128,14 @@
     .rules h2 { margin: 0 0 10px; font-size: 13.5px; color: var(--warning); font-weight: 600; }
     .rules ul { margin: 0; padding-left: 18px; color: var(--ink-soft); font-size: 13px; }
     .rules li { margin-bottom: 6px; }
-    .empty { padding: 34px 0; text-align: center; color: var(--muted); font-size: 13px; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>评论区话术生成器</h1>
     <p class="lead">
-      针对「异地恋一起看电影」这类帖子生成像真人写的回复。每次生成 6 条不同变体，
-      复制后自己改一两个字再发——一字不改地重复发会被平台判成营销号。
+      核心是<b>老实承认「我做了个网站」</b>——不装路人、不编故事。
+      每次生成 10 条不同版本，挑顺眼的复制，改一两个字再发。
     </p>
 
     <div class="controls">
@@ -153,51 +151,46 @@
         </select>
       </label>
       <label>
-        <span>语气</span>
-        <select id="tone">
-          <option value="share">过来人分享（最稳）</option>
-          <option value="casual">轻描淡写（最不像广告）</option>
-          <option value="ask">求助式（反向引流）</option>
+        <span>说法风格</span>
+        <select id="style">
+          <option value="direct">直接说明（最常用）</option>
+          <option value="brief">极简一句</option>
+          <option value="story">顺带讲讲为什么做</option>
+          <option value="feedback">求人试用提意见</option>
         </select>
       </label>
       <label>
-        <span>平台</span>
+        <span>平台排版</span>
         <select id="platform">
-          <option value="xhs">小红书</option>
-          <option value="bili">B站</option>
-          <option value="douban">豆瓣</option>
-          <option value="tieba">贴吧</option>
+          <option value="xhs">小红书（短段）</option>
+          <option value="bili">B站（整段）</option>
+          <option value="douban">豆瓣（整段）</option>
+          <option value="tieba">贴吧（口语）</option>
         </select>
       </label>
       <label>
-        <span>结尾方式</span>
-        <select id="closer">
-          <option value="mixed">自动搭配（推荐）</option>
-          <option value="name">只提名字</option>
-          <option value="link">带网址</option>
-          <option value="none">不提产品</option>
+        <span>诚实程度</span>
+        <select id="honesty">
+          <option value="full">全部明说是我做的</option>
+          <option value="soft">轻描淡写带一句</option>
         </select>
       </label>
     </div>
 
     <div class="actions">
-      <button class="btn primary" id="generate">生成 6 条</button>
-      <button class="btn" id="regenerate">换一批</button>
+      <button class="btn primary" id="generate">生成 10 条</button>
     </div>
 
-    <div class="result" id="result">
-      <p class="empty">选好场景，点「生成 6 条」。</p>
-    </div>
+    <div class="result" id="result"></div>
 
     <div class="rules">
-      <h2>发之前必须遵守</h2>
+      <h2>发之前</h2>
       <ul>
-        <li><b>只在真的相关的帖子下回复。</b>见帖就发链接，账号会被举报到封禁。</li>
-        <li><b>每条都改几个字。</b>同一段话复制粘贴超过 3 次，平台会识别为机器行为。</li>
-        <li><b>一天不超过 10 条。</b>新号更少，5 条以内。</li>
-        <li><b>7 成回复不要带链接。</b>只提名字，让人自己搜——反而更可信。</li>
-        <li><b>别用小号互相捧。</b>同一个 IP 的互评会被识别。</li>
-        <li><b>写完先自读一遍。</b>像不像人说话，你自己最清楚。</li>
+        <li><b>只在真的相关的帖子下回。</b>见帖就发，账号会被举报。</li>
+        <li><b>每条改一两个字。</b>一字不改复制超过 3 次会被识别成机器。</li>
+        <li><b>一天不超过 10 条。</b>新号 5 条以内。</li>
+        <li><b>承认缺点。</b>「只有 720p」「只能两个人」——说出来反而更可信。</li>
+        <li><b>被追问就老实答。</b>别绕，你是作者这件事藏不住。</li>
       </ul>
     </div>
   </div>
@@ -208,113 +201,157 @@
 
     var LINK = 'samehz.onrender.com';
 
-    var OPENERS = {
-      share: [
-        '我们异地两年，这个问题踩过所有的坑。',
-        '过来人说一句。',
-        '跟你一样的处境，试过好几种方式。',
-        '这个我太有发言权了。',
-        '我们也是异地，摸索了挺久。',
-        '看完评论区，说说我们的办法。',
-        '异地第三年，这方面算有点经验。',
-        '刚好我们上周还在聊这个。'
+    /* 自曝句：每条都必须包含「我做了 / 我写的」这类诚实声明 */
+    var CONFESS = {
+      direct: [
+        '我自己做了个网站，免费，就是干这个的。',
+        '这个我写了个网页工具，不收费。',
+        '我做了个免费的小网站解决这件事。',
+        '说个自荐的：我自己写了个网站，专门做这个。',
+        '我建了个网页，免费的，功能就一个。',
+        '正好我在做这个，已经上线了，免费。',
+        '这事我做了个工具，网页的，不要钱。',
+        '我自己折腾了一个网站，专门用来同步看电影。',
+        '先说结论：我做了个免费的网站。',
+        '我写了个小站，就是为这个场景做的。'
       ],
-      casual: [
-        '啊这个我们也在用。',
-        '顺手提一句。',
-        '其实有个很轻的办法。',
-        '我们现在的做法是——',
-        '碰巧前两天刚聊到这个。',
-        '无意中看到这帖，说一下。',
-        '可能有点偏题，但挺有用。',
-        '我们换了种方式之后好多了。'
+      brief: [
+        '我做了个免费网页就是干这个的。',
+        '有个我写的小站可以直接用。',
+        '我弄了个网页，免费，专治这个。',
+        '我做的，免费，搜一下就有。',
+        '我自己写了个，不用装东西。',
+        '我这边有个现成的，免费。'
       ],
-      ask: [
-        '有没有人也遇到这个情况……',
-        '一直想问，大家异地都是怎么解决的？',
-        '我先说我现在的做法，看有没有更好的。',
-        '求个同款，顺便分享下我们用的。',
-        '蹲一个，同时说下我们的方案。',
-        '同问，我们的解法是这样的。',
-        '有人试过不共享画面吗？',
-        '我们试出来一个还行的办法。'
+      story: [
+        '异地这两年一直没找到顺手的方案，最后自己写了个网站。',
+        '实在受不了屏幕共享的画质，周末自己写了个网页。',
+        '找了一圈没有合适的，干脆自己做了个网站。',
+        '这东西是我自己做的，起因就是我们俩吵过一次「你又剧透了」。',
+        '因为不想每次都折腾半小时，我写了个网站。',
+        '本来只想自己用，写完觉得可能有别人需要，就放出来了。',
+        '做这个的起因很蠢：我们为了「谁先按播放」生过气。',
+        '我本职是写代码的，顺手做了个网站给自己用。'
+      ],
+      feedback: [
+        '我做了个免费的小网站，功能很窄，想找人试试提提意见。',
+        '刚做完一个网页工具，不知道对别人有没有用，来问问。',
+        '自己写了个小站，想请几对异地的朋友帮忙试用一下。',
+        '做了个东西，只有我一个人用有点浪费，来看看有没有人需要。',
+        '厚着脸皮自荐一下，我做的，想收集点反馈。',
+        '有人愿意帮我试试吗？我自己做的免费网站。'
+      ],
+      soft: [
+        '顺便说一句，我自己做了个免费的小网站。',
+        '最后提一下，我写了个网页，免费。',
+        '另外我自己做了个工具，不收费，可以试试。',
+        '补一句，这个场景我自己做了个网站。',
+        '对了，我自己写了个，免费。'
       ]
     };
 
-    var MIDDLES = {
+    /* 痛点句：先接住楼主的处境 */
+    var PAIN = {
       screenShare: [
-        '屏幕共享最大的问题是压缩，画质糊到看不清演员表情，声音还经常卡成电音。',
-        '屏幕共享看着方便，但对方那边是压缩过的画面，一部电影下来眼睛很累。',
-        '共享出来的音频会二次编码，两个人再对着麦克风说话，基本听不清台词。',
-        '我们之前共享的时候，她那边经常缓冲，一个镜头卡三次，最后干脆聊了半小时天。',
-        '共享还特别吃 CPU，我这边风扇转得像起飞，画质反而更低。',
-        '两个人网速不一样的时候最惨，慢的那个一直拖着快的。'
+        '屏幕共享的问题是压缩，画质糊，声音还经常卡。',
+        '共享出来对方那边是压缩画面，看两小时眼睛很累。',
+        '两个人网速不一样的时候，慢的那个一直拖着快的。',
+        '共享还特别吃 CPU，我这边风扇转得像起飞。',
+        ''
       ],
       howTo: [
-        '后来改成各自在本地放同一部电影，只同步播放进度——她按暂停我这边也停。',
-        '现在的做法是各看各的文件，中间只传一个「第几秒」，画质是原片。',
-        '关键思路是：不传视频，只传进度。这样不压缩也不卡。',
-        '我们不再共享画面了，改成两个人放同一个片源，进度对齐就行。',
-        '找了半天发现市面上有专门做这件事的小工具，比硬凑方便。',
-        '最简单的判断标准：谁都不用牺牲画质，就对了。'
+        '异地一起看电影最麻烦的是「同时」。',
+        '每次都要掐着秒表按播放，差几秒就有人剧透。',
+        '一边打电话一边看，最后电影没看成光聊天了。',
+        '想找一部两个人都想看的，比同步还难。',
+        ''
       ],
       bilibili: [
-        'B站现在也能同步了，粘贴同一个链接，两个人进度一致。',
-        '我们追番是用链接同步的，谁按暂停另一边也停。',
-        '番剧的话直接贴 B站链接就行，不用两个人掐着秒表按播放。',
-        '以前只能看本地文件，现在贴链接也能一起看，方便很多。',
-        'B站的视频不用下载，贴上去两边都能放。',
-        '大会员内容还是得自己有会员，但普通视频没问题。'
+        'B站没法共享播放进度，两个人进度永远差一点。',
+        '追番的时候最怕对方提前看完。',
+        '想一起看但找不到顺手的办法。',
+        ''
       ],
       series: [
-        '追剧最麻烦的是「你看到第几集了」，我们现在进度是共用的。',
-        '综艺和短剧也适用，一集二十分钟，看完各自睡。',
-        '日更的剧特别需要这个，不然第二天就有人剧透。',
-        '我们约定一次只看到同一集，谁先偷看谁请喝奶茶。',
-        '进度同步之后，讨论剧情终于在同一频道上了。',
-        '一周两集的那种，看完刚好能聊四十分钟。'
+        '追剧最难的是「你看到第几集」。',
+        '日更的剧，第二天就有人忍不住剧透。',
+        '两个人节奏不一样，最后只能各看各的。',
+        ''
       ],
       gift: [
-        '与其送礼物，不如固定一个「一起看电影」的时间，比什么都管用。',
-        '我们的仪式感就是每周三晚上十一点半，雷打不动看一部片。',
-        '异地最缺的不是礼物，是「同时在场」的感觉。',
-        '试过送东西，但真正留住的是那些「说好一起做」的小事。',
-        '把电影夜做成固定日程，比突发的惊喜更持久。',
-        '有时候什么都不用说，一起安静看完两小时就够了。'
+        '异地最缺的不是礼物，是「同时在场」。',
+        '送东西送多了也没意思，不如固定做一件事。',
+        '仪式感这东西，靠的是坚持不是花钱。',
+        ''
       ],
       tool: [
-        '试过好几个，最后留下的是个只同步进度的小网站。',
-        '不需要装软件，浏览器打开就行，两个人都放自己的片源。',
-        '功能很单一，就干一件事：让两个人的进度一致。',
-        '我比较怕那种功能一大堆的，最后能坚持用的都是极简的。',
-        '打开网页就能用，连注册都不用，这点很省心。',
-        '对网络要求不高，我们两个网速差挺多也没问题。'
+        '试过好几个，要么太重要么收费。',
+        '市面上大多是要装客户端的，嫌麻烦。',
+        '找了一圈，没找到只做「同步进度」的。',
+        ''
       ]
     };
 
-    var DETAILS = [
-      '偏差超过 0.85 秒会自动拉回来，不用手动对。',
-      '拖动进度、暂停、继续，全都是实时同步的。',
-      '它不存片也不传片，所以理论上什么画质就是什么画质。',
-      '手机电脑都能用，她那台旧笔记本也不卡。',
-      '每 3 秒自动核对一次，误差基本在 0.0x 秒。',
-      '免费，也没有广告弹窗。',
-      '支持本地文件，也支持贴链接（B站、YouTube、mp4 都行）。'
-    ];
+    /* 做法句：说清楚这个网站干什么 */
+    var HOW = {
+      screenShare: [
+        '两个人在各自设备放同一部电影，只同步「播到第几秒」，画质是原片。',
+        '不传视频，只传进度。所以不压缩，也不吃带宽。',
+        '谁按暂停另一边也停，拖进度也是同步的。',
+        '偏差超过 0.85 秒会自动拉回来，不用手动对。',
+        '它不存片也不传片，你手里是什么画质就是什么画质。'
+      ],
+      howTo: [
+        '思路是各自放自己的文件，中间只同步一个时间戳。',
+        '两个人打开同一部片子，进度互相同步。',
+        '不用共享画面，也不用同时按播放键。',
+        '每 3 秒自动核对一次，误差基本在 0.0x 秒。',
+        '支持本地文件，也能贴链接（B站、YouTube、mp4）。'
+      ],
+      bilibili: [
+        '现在贴 B站链接也能同步，两边进度一致。',
+        'B站视频不用下载，贴上去两边都能放。',
+        '它会把链接解析成能直接播的地址，两边各自加载。',
+        '追番的话贴同一个链接就行。'
+      ],
+      series: [
+        '进度是共用的，谁看到第几集一目了然。',
+        '一集二十分钟，看完各自睡，第二天接着看。',
+        '约好一次只看同一集，谁先偷看谁请奶茶。',
+        '综艺短剧也能用，不用两个人对着喊「你准备好了吗」。'
+      ],
+      gift: [
+        '我们现在的固定日程是每周三晚上十一点半，雷打不动。',
+        '把电影夜做成日程，比突发的惊喜更持久。',
+        '用这个小站开场，省掉了「你准备好了吗」的来回。',
+        '仪式感其实是「说好一起做」然后真的做到。'
+      ],
+      tool: [
+        '它只干一件事：让两个人的进度一致。',
+        '浏览器打开就能用，不用注册。',
+        '没有花哨功能，所以也不卡。',
+        '免费，也没广告弹窗。'
+      ]
+    };
 
-    var CLOSERS = {
-      name: [
-        '搜 samehz 就有。',
-        '叫同频，搜得到。',
-        '名字是 samehz，自己搜吧。',
-        '搜「同频」试试。'
+    /* 结尾：承认局限 + 给路径 */
+    var CLOSER = {
+      direct: [
+        '搜 samehz 就能找到，免费。',
+        '地址是 ' + LINK + '，直接打开就行。',
+        '名字叫同频，搜 samehz 也有。',
+        '有需要可以试试，不合适就当我没说。',
+        '搜「同频」应该能找到。',
+        '免费用的，也没打算收费。'
       ],
-      link: [
-        '地址是 ' + LINK + '。',
-        LINK + ' 这个，免费的。',
-        '直接开 ' + LINK + ' 就行。'
+      humble: [
+        '功能很简陋，只有两个人能进，但够用。',
+        '清晰度看片源，B站链接的话是 720p，别期待太高。',
+        '不是商业产品，就是我自己在维护。',
+        '做得很粗糙，能用就行。',
+        '没什么技术含量，胜在简单。'
       ],
-      none: [
+      soft: [
         '',
         '',
         '你们也可以试试类似的做法。',
@@ -323,58 +360,62 @@
     };
 
     var EMOJI = {
-      xhs: ['', '', '🥲', '🎬', ' ', ''],
-      bili: ['', '', '', ' ', '', ''],
+      xhs: ['', '', '🥲', '', '🎬', ''],
+      bili: ['', '', '', '', '', ''],
       douban: ['', '', '', '', '', ''],
       tieba: ['', '', '', '', '', '']
     };
 
-    function pick(list, used) {
+    function pickUnique(list, used) {
       var pool = list.filter(function (item) { return used.indexOf(item) === -1; });
       if (!pool.length) pool = list.slice();
       var value = pool[Math.floor(Math.random() * pool.length)];
-      if (used.indexOf(value) === -1) used.push(value);
+      used.push(value);
       return value;
     }
 
-    function join(platform, parts) {
-      var text = parts.filter(Boolean).join('');
+    function shape(platform, text) {
       if (platform === 'xhs') {
-        // 小红书：短段落 + 空行，读起来不累
         return text
-          .replace(/。([^。])/g, '。\n$1')
+          .replace(/。([^。\n])/g, '。\n$1')
+          .replace(/，([^，\n]{6,})/g, '，\n$1')
           .replace(/\n{2,}/g, '\n')
           .replace(/\n$/, '');
       }
-      if (platform === 'bili' || platform === 'douban') {
-        return text;
+      if (platform === 'tieba') {
+        return text.replace(/\n/g, ' ');
       }
-      return text.replace(/\n/g, ' ');
+      return text;
     }
 
-    function buildOne(scene, tone, platform, closerMode, used) {
-      var opener = pick(OPENERS[tone], used.openers);
-      var middle = pick(MIDDLES[scene], used.middles);
-      var detail = Math.random() < 0.72 ? pick(DETAILS, used.details) : '';
-      var closerKey = closerMode;
-      if (closerMode === 'mixed') {
-        closerKey = ['name', 'name', 'link', 'none'][Math.floor(Math.random() * 4)];
-      }
-      var closer = pick(CLOSERS[closerKey], used.closers);
-      var emoji = pick(EMOJI[platform] || [''], []);
-      return join(platform, [opener, middle, detail, closer]) + emoji;
+    function buildOne(scene, style, platform, honesty, used) {
+      var confessPool = honesty === 'soft' ? CONFESS.soft : CONFESS[style];
+      var confess = pickUnique(confessPool, used.confess);
+      var pain = pickUnique(PAIN[scene], used.pain);
+      var how = pickUnique(HOW[scene], used.how);
+      var closerKey = Math.random() < 0.62 ? 'direct' : 'humble';
+      if (honesty === 'soft' && Math.random() < 0.5) closerKey = 'soft';
+      var closer = pickUnique(CLOSER[closerKey], used.closer);
+      var emoji = pickUnique(EMOJI[platform] || [''], []);
+
+      var parts = [pain, confess, how, closer].filter(function (part) { return part; });
+      var text = parts.join('');
+      return shape(platform, text) + emoji;
     }
 
     function generate() {
       var scene = document.getElementById('scene').value;
-      var tone = document.getElementById('tone').value;
+      var style = document.getElementById('style').value;
       var platform = document.getElementById('platform').value;
-      var closerMode = document.getElementById('closer').value;
+      var honesty = document.getElementById('honesty').value;
 
-      var used = { openers: [], middles: [], details: [], closers: [] };
+      var used = { confess: [], pain: [], how: [], closer: [] };
       var items = [];
-      for (var i = 0; i < 6; i += 1) {
-        items.push(buildOne(scene, tone, platform, closerMode, used));
+      var guard = 0;
+      while (items.length < 10 && guard < 200) {
+        guard += 1;
+        var text = buildOne(scene, style, platform, honesty, used);
+        if (items.indexOf(text) === -1) items.push(text);
       }
 
       var result = document.getElementById('result');
@@ -384,12 +425,12 @@
 
         var meta = document.createElement('div');
         meta.className = 'meta';
-        var indexLabel = document.createElement('span');
-        indexLabel.textContent = '变体 ' + (index + 1);
-        var lengthLabel = document.createElement('b');
-        lengthLabel.textContent = text.length + ' 字';
-        meta.appendChild(indexLabel);
-        meta.appendChild(lengthLabel);
+        var label = document.createElement('span');
+        label.textContent = '版本 ' + (index + 1);
+        var length = document.createElement('b');
+        length.textContent = text.length + ' 字';
+        meta.appendChild(label);
+        meta.appendChild(length);
 
         var paragraph = document.createElement('p');
         paragraph.textContent = text;
@@ -440,7 +481,6 @@
     }
 
     document.getElementById('generate').addEventListener('click', generate);
-    document.getElementById('regenerate').addEventListener('click', generate);
     generate();
   })();
   </script>
