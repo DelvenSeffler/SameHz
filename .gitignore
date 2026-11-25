@@ -1,9 +1,24 @@
+# 依赖
 node_modules/
 .npm-cache/
+
+# 运行与统计产物
+data/
+*.log
+test/screenshots/
+
+# 测试与浏览器缓存
 .chrome-test/
 .chrome-test.pid
-test/screenshots/
-*.log
-.DS_Store
 
-data/
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 与 SameHz 无关的历史文件（勿误提交）
+work/
+screenshots/
+lab3.txt
+make_pictures.py
+pdfextract.py
+test_shots.vb
