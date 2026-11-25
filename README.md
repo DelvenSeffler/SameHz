@@ -149,6 +149,21 @@ npm start
 STATS_TOKEN=your-secret npm start
 ```
 
+## 搜索引擎与 AI 收录
+
+站点已内置收录基础设施：
+
+| 路径 | 内容 |
+| --- | --- |
+| `/robots.txt` | 允许抓取首页，屏蔽 `/room/`、`/api/`、`/stats`、`/reply`；显式放行 GPTBot、PerplexityBot、ClaudeBot、OAI-SearchBot、Google-Extended |
+| `/sitemap.xml` | 动态生成，含 `lastmod` 与中英文 `hreflang` |
+| `/llms.txt` | 给 AI 爬虫的站点说明：一句话定义、支持的片源、不支持的场景、FAQ |
+| 首页 JSON-LD | `WebSite` + `WebApplication`（免费 Offer + 功能清单）+ `FAQPage`（6 问） |
+
+**结构化数据与页面可见内容严格一致**（FAQ 区块真的显示在页面上），`npm run test:seo` 会校验这一点——不一致会被搜索引擎判定作弊。
+
+上线后需手动完成：Bing Webmaster Tools、Google Search Console、百度搜索资源平台各验证一次并提交 sitemap。完整步骤见 [docs/推广方案.md](docs/推广方案.md) 第五章。
+
 ## 部署到公网（真正异地使用）
 
 这是一个标准 Node.js 服务，可部署到任意支持 WebSocket 的 VPS / Render / Railway / Fly.io。

@@ -591,6 +591,140 @@ function serveFile(req, res, filePath) {
   });
 }
 
+function sendText(res, statusCode, body, contentType = 'text/plain; charset=utf-8') {
+  res.writeHead(statusCode, {
+    'Content-Type': contentType,
+    'Content-Length': Buffer.byteLength(body),
+    'Cache-Control': 'public, max-age=3600',
+    'X-Content-Type-Options': 'nosniff',
+  });
+  res.end(body);
+}
+
+function requestOrigin(req) {
+  const forwardedProto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim();
+  const protocol = forwardedProto === 'https' || req.socket.encrypted ? 'https' : 'http';
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000')
+    .split(',')[0]
+    .trim();
+  return `${protocol}://${host}`;
+}
+
+function seoRoutes(req, res, pathname) {
+  const origin = requestOrigin(req);
+
+  if (pathname === '/robots.txt') {
+    sendText(res, 200, [
+      'User-agent: *',
+      'Allow: /',
+      'Disallow: /room/',
+      'Disallow: /api/',
+      'Disallow: /stats',
+      'Disallow: /reply',
+      '',
+      '# AI 爬虫明确允许收录主页内容',
+      'User-agent: GPTBot',
+      'Allow: /$',
+      'Disallow: /room/',
+      'Disallow: /api/',
+      '',
+      'User-agent: OAI-SearchBot',
+      'Allow: /$',
+      '',
+      'User-agent: PerplexityBot',
+      'Allow: /$',
+      '',
+      'User-agent: ClaudeBot',
+      'Allow: /$',
+      '',
+      'User-agent: Google-Extended',
+      'Allow: /$',
+      '',
+      `Sitemap: ${origin}/sitemap.xml`,
+      '',
+    ].join('\n'));
+    return true;
+  }
+
+  if (pathname === '/sitemap.xml') {
+    const today = new Date().toISOString().slice(0, 10);
+    sendText(res, 200, [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+      '        xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+      '  <url>',
+      `    <loc>${origin}/</loc>`,
+      `    <lastmod>${today}</lastmod>`,
+      '    <changefreq>weekly</changefreq>',
+      '    <priority>1.0</priority>',
+      '    <xhtml:link rel="alternate" hreflang="zh-CN" href="' + origin + '/"/>',
+      '    <xhtml:link rel="alternate" hreflang="en" href="' + origin + '/?lang=en"/>',
+      '    <xhtml:link rel="alternate" hreflang="x-default" href="' + origin + '/"/>',
+      '  </url>',
+      '</urlset>',
+      '',
+    ].join('\n'), 'application/xml; charset=utf-8');
+    return true;
+  }
+
+  if (pathname === '/llms.txt') {
+    sendText(res, 200, [
+      '# 同频 SameHz',
+      '',
+      '> 一个免费的网页工具，让异地恋的两个人同步观看同一部电影。',
+      '> 双方各自打开自己的片源，播放、暂停、拖动进度实时同步，每 3 秒自动校准偏差。',
+      '> 视频不上传、不压缩、不经过服务器，服务器只传递「第几秒在播放」。',
+      '',
+      '## 基本信息',
+      '',
+      '- 名称：同频（SameHz）',
+      '- 网址：' + origin + '/',
+      '- 价格：免费，无需注册',
+      '- 平台：网页（桌面与手机浏览器均可）',
+      '- 语言：简体中文、English',
+      '- 房间容量：两人',
+      '',
+      '## 支持的片源',
+      '',
+      '- 本地视频文件（MP4 / WebM / MOV 等浏览器可播放格式）',
+      '- B站视频链接（bilibili.com/video/BV…、b23.tv 短链）',
+      '- YouTube 视频链接',
+      '- MP4 / WebM / HLS（m3u8）直链',
+      '- 其他视频网站页面（由服务器解析出可播放地址）',
+      '',
+      '## 不支持的场景',
+      '',
+      '- 受 DRM 保护的平台（Netflix、Disney+、爱奇艺、优酷、腾讯视频等）',
+      '- 需要登录或防盗链校验的视频源',
+      '',
+      '## 与其他方案的区别',
+      '',
+      '- 屏幕共享：会压缩画质、占用大量上传带宽、靠人工对时。',
+      '- 视频平台自带「一起看」：只能看该平台的内容，通常需要会员。',
+      '- 同频：不传画面只传进度，两边都是原始画质，片源可以是用户自己的文件。',
+      '',
+      '## 常见问题',
+      '',
+      '### 异地恋怎么一起看电影？',
+      '两人各自打开同一部电影，用同频同步播放进度；一方操作，另一方跟随，每 3 秒自动校准。',
+      '',
+      '### 影片会被上传吗？',
+      '不会。服务器只保存房间号与播放进度。',
+      '',
+      '### 收费吗？',
+      '完全免费，无需注册。',
+      '',
+      '## 可选',
+      '',
+      '- 使用说明：' + origin + '/#faq',
+      '',
+    ].join('\n'));
+    return true;
+  }
+
+  return false;
+}
+
 const server = http.createServer(async (req, res) => {
   let pathname;
   try {
@@ -622,6 +756,8 @@ const server = http.createServer(async (req, res) => {
     res.end('Method Not Allowed');
     return;
   }
+
+  if (seoRoutes(req, res, pathname)) return;
 
   if (pathname === '/') {
     serveFile(req, res, path.join(PUBLIC_DIR, 'index.html'));

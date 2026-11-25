@@ -157,6 +157,71 @@ function html(cover, size) {
   const written = [];
 
   try {
+    // 社交分享图（Open Graph / Twitter Card）
+    const ogSize = { width: 1200, height: 630 };
+    const ogHtml = `<!doctype html><html><head><meta charset="utf-8"><style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1200px; height: 630px; overflow: hidden; }
+      body {
+        display: flex; align-items: center; gap: 54px;
+        padding: 0 70px;
+        background:
+          radial-gradient(ellipse 70% 80% at 8% 0%, rgba(198, 88, 52, 0.4), transparent 62%),
+          radial-gradient(ellipse 60% 70% at 100% 100%, rgba(120, 42, 26, 0.3), transparent 66%),
+          #0b0a09;
+        font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        color: #f7f1e6;
+      }
+      .left { flex: 1; }
+      .brand {
+        display: flex; align-items: center; gap: 12px;
+        margin-bottom: 26px;
+        color: #d6b78b; font-size: 21px; font-weight: 600; letter-spacing: 0.18em;
+      }
+      .brand i { width: 34px; height: 34px; border-radius: 50%; background: #ff6a4d; opacity: .9; }
+      h1 {
+        font-family: "Songti SC", "STSong", serif;
+        font-size: 62px; font-weight: 500; line-height: 1.24; letter-spacing: -0.015em;
+      }
+      h1 em { font-style: normal; color: #ff8166; }
+      p { margin-top: 22px; color: #aba295; font-size: 22px; line-height: 1.6; }
+      .tags { display: flex; gap: 10px; margin-top: 30px; }
+      .tags span {
+        padding: 8px 16px; border: 1px solid rgba(143, 211, 164, .4);
+        border-radius: 100px; color: #8fd3a4; font-size: 17px; font-weight: 600;
+      }
+      .right { width: 300px; display: flex; flex-direction: column; gap: 14px; }
+      .screen {
+        height: 150px; border-radius: 12px;
+        border: 1px solid rgba(244, 236, 223, .2);
+        background: linear-gradient(140deg, rgba(196, 120, 62, .5), rgba(28, 20, 16, .9));
+        display: flex; align-items: center; justify-content: center;
+        color: rgba(247, 241, 230, .82); font-size: 15px; letter-spacing: .18em;
+      }
+      .row { display: flex; align-items: center; gap: 10px; color: #aba295; font-size: 15px; }
+      .row b { color: #ff8166; font-variant-numeric: tabular-nums; }
+    </style></head><body>
+      <div class="left">
+        <div class="brand"><i></i>同 频 · S A M E H Z</div>
+        <h1>异地恋一起看电影<br><em>进度同步到同一帧</em></h1>
+        <p>各自放自己的片源，只同步播放进度。原画质、不上传、免费。</p>
+        <div class="tags"><span>免费</span><span>无需注册</span><span>支持 B站</span></div>
+      </div>
+      <div class="right">
+        <div class="screen">你的屏幕</div>
+        <div class="row">误差 <b>0.01s</b> · 自动校准</div>
+        <div class="screen">TA 的屏幕</div>
+      </div>
+    </body></html>`;
+    await page.setViewportSize(ogSize);
+    await page.setContent(ogHtml, { waitUntil: 'load' });
+    await page.evaluate(() => document.fonts.ready);
+    const ogPath = path.resolve('public/img/og-cover.png');
+    fs.mkdirSync(path.dirname(ogPath), { recursive: true });
+    await page.screenshot({ path: ogPath, type: 'png' });
+    written.push(ogPath);
+    console.log('✓', path.relative(process.cwd(), ogPath));
+
     for (const cover of COVERS) {
       for (const [name, size] of Object.entries(SIZES)) {
         await page.setViewportSize(size);
@@ -168,7 +233,7 @@ function html(cover, size) {
         console.log('✓', path.relative(process.cwd(), file));
       }
     }
-    console.log(`\n共生成 ${written.length} 张封面 → ${path.relative(process.cwd(), OUT)}`);
+    console.log(`\n共生成 ${written.length} 张图片`);
     console.log('配文可在 assets/covers/captions.md 里取用。');
   } finally {
     await browser.close();

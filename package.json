@@ -12,6 +12,7 @@
     "test:resolve": "node tools/test-resolve.js",
     "test:growth": "node tools/test-growth.js",
     "test:reply": "node tools/test-reply.js",
+    "test:seo": "node tools/test-seo.js",
     "gen:covers": "node tools/gen-covers.js",
     "test:e2e": "node tools/e2e.js",
     "sample": "node tools/make-sample.js"

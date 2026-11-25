@@ -1817,3 +1817,89 @@ svg {
 .footer-note {
   letter-spacing: 0.16em;
 }
+
+/* ---------- FAQ 与对比表 ---------- */
+
+.faq-section {
+  width: min(1320px, calc(100% - 80px));
+  margin: 0 auto;
+  padding: clamp(64px, 9vw, 120px) 0 clamp(72px, 9vw, 110px);
+  border-top: 1px solid var(--line);
+}
+
+.faq-subtitle {
+  margin: 34px 0 14px;
+  font-family: var(--serif);
+  font-size: clamp(19px, 1.8vw, 24px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.compare-table-wrap { margin-bottom: 46px; }
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.compare-table thead th {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  border-bottom-color: var(--line-strong);
+}
+
+.compare-table tbody th {
+  color: var(--ink-soft);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.compare-table td { color: var(--muted); }
+
+.compare-table .is-highlight th { color: var(--accent-hot); }
+.compare-table .is-highlight td {
+  color: var(--ink-soft);
+  background: rgba(255, 106, 77, 0.045);
+}
+
+.faq-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 26px 40px;
+  margin: 0;
+}
+
+.faq-item dt {
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.faq-item dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.8;
+}
+
+@media (max-width: 860px) {
+  .faq-section { width: calc(100% - 40px); }
+  .compare-table-wrap { overflow-x: auto; }
+  .compare-table { min-width: 660px; }
+  .faq-list { grid-template-columns: 1fr; gap: 22px; }
+}

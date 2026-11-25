@@ -4,10 +4,134 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b0a09">
-  <meta name="description" content="同频，一间只属于两个人的同步放映室。各自打开本地片源，播放、暂停、进度实时同步，不压缩画质，不上传影片。">
-  <title>同频 · 隔着山海，一起看同一帧</title>
+  <title>异地恋一起看电影 | 同频 SameHz · 两个人同步播放同一部电影</title>
+  <meta name="description" content="异地恋想一起看电影？同频（SameHz）是一个免费的网页工具：两人各自打开自己的片源，播放、暂停、拖动进度实时同步，每 3 秒自动校准误差，不压缩画质、不上传影片。支持本地视频、B站、YouTube 和 MP4 链接。无需注册，打开网页就能用。">
+  <meta name="keywords" content="异地恋一起看电影, 两个人同步看电影, 一起看电影的软件, 同步播放, 异地恋看电影工具, 异地恋 电影, B站一起看, 一起追剧">
+  <link rel="canonical" href="https://samehz.onrender.com/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="author" content="SameHz">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="同频 SameHz">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:title" content="异地恋一起看电影 | 同频 SameHz">
+  <meta property="og:description" content="两个人各自打开同一部电影，进度实时同步，原画质不压缩。免费，无需注册，影片不上传。">
+  <meta property="og:url" content="https://samehz.onrender.com/">
+  <meta property="og:image" content="https://samehz.onrender.com/img/og-cover.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="异地恋一起看电影 | 同频 SameHz">
+  <meta name="twitter:description" content="两个人各自打开同一部电影，进度实时同步，原画质不压缩。免费，无需注册。">
+  <meta name="twitter:image" content="https://samehz.onrender.com/img/og-cover.png">
+
+  <link rel="alternate" hreflang="zh-CN" href="https://samehz.onrender.com/">
+  <link rel="alternate" hreflang="en" href="https://samehz.onrender.com/?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://samehz.onrender.com/">
+
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://samehz.onrender.com/#website",
+        "url": "https://samehz.onrender.com/",
+        "name": "同频 SameHz",
+        "alternateName": ["同频", "SameHz", "Tongpin"],
+        "description": "异地恋两个人同步看电影的免费网页工具",
+        "inLanguage": ["zh-CN", "en"]
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://samehz.onrender.com/#app",
+        "name": "同频 SameHz",
+        "url": "https://samehz.onrender.com/",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Web",
+        "browserRequirements": "需要支持 WebSocket 的现代浏览器",
+        "description": "同频是一个免费的网页工具，让异地恋的两个人同步观看同一部电影。双方各自打开本地片源或视频链接，播放、暂停、拖动进度实时同步，每 3 秒自动校准偏差。视频不上传、不压缩、不经过服务器。",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "CNY"
+        },
+        "featureList": [
+          "两个人同步播放同一部电影",
+          "播放、暂停、拖动进度实时同步",
+          "每 3 秒自动校准进度偏差",
+          "一键手动对齐",
+          "支持本地视频文件（MP4 / WebM / MOV）",
+          "支持 B站、YouTube 链接",
+          "支持 MP4 / WebM / HLS 直链",
+          "六位房间码邀请",
+          "影片不上传服务器",
+          "无需注册"
+        ],
+        "isAccessibleForFree": true
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://samehz.onrender.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "异地恋怎么一起看电影？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "两个人各自在自己设备上打开同一部电影，用同频（SameHz）同步播放进度即可。一方播放、暂停或拖动进度，另一方的画面会跟着同步，每 3 秒自动校准一次偏差。影片留在各自设备上，不需要上传，也不压缩画质。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "同频需要付费吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "免费。目前所有功能免费使用，无需注册账号，打开网页创建房间就能用。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "影片会被上传到服务器吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "不会。服务器只传递播放状态（第几秒在播放），视频文件始终留在你自己的设备上，或者由浏览器直接从源站加载。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "支持 B站和 YouTube 吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "支持。粘贴 B站或 YouTube 的视频链接，双方会自动载入同一条链接并同步播放。B站免登录链接的清晰度上限为 720p。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "可以在手机上和对方一起看吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "可以。同频是网页工具，手机浏览器打开就能用，一台手机一台电脑也可以同步。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "和屏幕共享有什么不同？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "屏幕共享会把画面压缩后传给对方，画质下降、占用大量带宽。同频不传画面，只同步「播到第几秒」，所以两边都是各自的原始画质，也不消耗流量。"
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body class="landing-page">
   <div class="ambient" aria-hidden="true">
@@ -246,6 +370,78 @@
         <span>创建放映室</span>
         <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3.5 10h12M10.5 4.8 15.8 10l-5.3 5.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
+    </section>
+
+    <section class="faq-section" id="faq" aria-labelledby="faq-title">
+      <div class="section-heading">
+        <p class="section-kicker">QUESTIONS</p>
+        <h2 id="faq-title">常见问题</h2>
+      </div>
+
+      <div class="compare-table-wrap">
+        <h3 class="faq-subtitle">异地恋一起看电影的几种方式对比</h3>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th scope="col">方式</th>
+              <th scope="col">画质</th>
+              <th scope="col">流量消耗</th>
+              <th scope="col">进度同步</th>
+              <th scope="col">片源限制</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">屏幕共享（腾讯会议 / Discord）</th>
+              <td>压缩后画质，通常 720p 以下</td>
+              <td>高，按视频码率持续上传</td>
+              <td>靠盯屏幕，容易错位</td>
+              <td>发起方电脑必须一直开着</td>
+            </tr>
+            <tr>
+              <th scope="row">视频平台的「一起看」</th>
+              <td>平台提供什么就是什么</td>
+              <td>无额外消耗</td>
+              <td>有</td>
+              <td>只能看平台有的内容，通常要会员</td>
+            </tr>
+            <tr class="is-highlight">
+              <th scope="row">同频 SameHz</th>
+              <td>各自的原始画质，不压缩</td>
+              <td>几乎为零，只传播放状态</td>
+              <td>每 3 秒自动校准</td>
+              <td>你自己有的片源、B站链接、直链都能放</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <dl class="faq-list">
+        <div class="faq-item">
+          <dt>异地恋怎么一起看电影？</dt>
+          <dd>两个人各自在自己设备上打开同一部电影，用同频同步播放进度即可。一方播放、暂停或拖动进度，另一方的画面会跟着同步，每 3 秒自动校准一次偏差。影片留在各自设备上，不需要上传，也不压缩画质。</dd>
+        </div>
+        <div class="faq-item">
+          <dt>同频需要付费吗？</dt>
+          <dd>免费。目前所有功能免费使用，无需注册账号，打开网页创建房间就能用。</dd>
+        </div>
+        <div class="faq-item">
+          <dt>影片会被上传到服务器吗？</dt>
+          <dd>不会。服务器只传递播放状态（第几秒在播放），视频文件始终留在你自己的设备上，或者由浏览器直接从源站加载。</dd>
+        </div>
+        <div class="faq-item">
+          <dt>支持 B站和 YouTube 吗？</dt>
+          <dd>支持。粘贴 B站或 YouTube 的视频链接，双方会自动载入同一条链接并同步播放。B站免登录链接的清晰度上限为 720p。</dd>
+        </div>
+        <div class="faq-item">
+          <dt>可以在手机上和对方一起看吗？</dt>
+          <dd>可以。同频是网页工具，手机浏览器打开就能用，一台手机一台电脑也可以同步。</dd>
+        </div>
+        <div class="faq-item">
+          <dt>和屏幕共享有什么不同？</dt>
+          <dd>屏幕共享会把画面压缩后传给对方，画质下降、占用大量带宽。同频不传画面，只同步「播到第几秒」，所以两边都是各自的原始画质，也不消耗流量。</dd>
+        </div>
+      </dl>
     </section>
   </main>
 
