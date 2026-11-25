@@ -31,6 +31,7 @@ const MIME_TYPES = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
   '.mp4': 'video/mp4',
@@ -669,7 +670,7 @@ function seoRoutes(req, res, pathname) {
 
   if (pathname === '/llms.txt') {
     sendText(res, 200, [
-      '# 同频 SameHz',
+      '# 同频观影 SameHz',
       '',
       '> 一个免费的网页工具，让异地恋的两个人同步观看同一部电影。',
       '> 双方各自打开自己的片源，播放、暂停、拖动进度实时同步，每 3 秒自动校准偏差。',
@@ -677,7 +678,7 @@ function seoRoutes(req, res, pathname) {
       '',
       '## 基本信息',
       '',
-      '- 名称：同频（SameHz）',
+      '- 名称：同频观影（SameHz）',
       '- 网址：' + origin + '/',
       '- 价格：免费，无需注册',
       '- 平台：网页（桌面与手机浏览器均可）',
@@ -701,12 +702,12 @@ function seoRoutes(req, res, pathname) {
       '',
       '- 屏幕共享：会压缩画质、占用大量上传带宽、靠人工对时。',
       '- 视频平台自带「一起看」：只能看该平台的内容，通常需要会员。',
-      '- 同频：不传画面只传进度，两边都是原始画质，片源可以是用户自己的文件。',
+      '- 同频观影：不传画面只传进度，两边都是原始画质，片源可以是用户自己的文件。',
       '',
       '## 常见问题',
       '',
       '### 异地恋怎么一起看电影？',
-      '两人各自打开同一部电影，用同频同步播放进度；一方操作，另一方跟随，每 3 秒自动校准。',
+      '两人各自打开同一部电影，用同频观影同步播放进度；一方操作，另一方跟随，每 3 秒自动校准。',
       '',
       '### 影片会被上传吗？',
       '不会。服务器只保存房间号与播放进度。',
@@ -881,9 +882,9 @@ process.on('unhandledRejection', (error) => console.error('[unhandled]', error))
 
 server.listen(PORT, HOST, () => {
   console.log('');
-  console.log('  ┌───────────────────────────────────────────┐');
-  console.log('  │  同频 · 私人同步放映室                    │');
-  console.log('  └───────────────────────────────────────────┘');
+  console.log('  ┌───────────────────────────────────────────────┐');
+  console.log('  │  同频观影 · 私人同步放映室                     │');
+  console.log('  └───────────────────────────────────────────────┘');
   console.log(`  本机访问   http://localhost:${PORT}`);
   const interfaces = os.networkInterfaces();
   for (const entries of Object.values(interfaces)) {

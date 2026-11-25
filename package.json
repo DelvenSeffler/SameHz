@@ -2,7 +2,7 @@
   "name": "tongpin-sync-cinema",
   "version": "1.0.0",
   "private": true,
-  "description": "同频 · 为异地情侣打造的私人同步放映室",
+  "description": "同频观影 · 为异地情侣打造的私人同步放映室",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -15,15 +15,25 @@
     "test:seo": "node tools/test-seo.js",
     "gen:covers": "node tools/gen-covers.js",
     "test:e2e": "node tools/e2e.js",
-    "sample": "node tools/make-sample.js"
+    "sample": "node tools/make-sample.js",
+    "cap:sync": "cap sync",
+    "cap:android": "cap open android",
+    "cap:ios": "cap open ios",
+    "cap:build:android": "cap sync android && cd android && gradlew.bat assembleDebug",
+    "gen:app-icons": "node tools/gen-app-icons.js && cap sync"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/ios": "^8.6.2",
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "^8.6.2",
     "playwright-core": "^1.65.0"
   }
 }

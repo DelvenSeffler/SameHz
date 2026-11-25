@@ -22,3 +22,19 @@ lab3.txt
 make_pictures.py
 pdfextract.py
 test_shots.vb
+
+# Capacitor / 移动端构建产物
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/app/src/main/assets/public/
+ios/App/App/public/
+ios/App/Pods/
+ios/App/build/
+*.apk
+*.aab
+*.ipa
+
+# 构建产物
+dist/

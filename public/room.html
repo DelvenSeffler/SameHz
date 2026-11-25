@@ -4,13 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080807">
-  <meta name="description" content="同频私人同步放映室。两个人，同一部电影，同一秒。">
+  <meta name="description" content="同频观影私人同步放映室。两个人，同一部电影，同一秒。">
   <meta name="robots" content="noindex, nofollow">
   <link rel="canonical" href="https://samehz.onrender.com/">
-  <title>放映室 · 同频</title>
+  <title>放映室 · 同频观影</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icons/icon-192.webp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="同频观影">
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/room.css">
+  <script src="/js/config.js"></script>
   <script src="/js/i18n.js" defer></script>
 </head>
 <body class="room-page">
@@ -46,7 +52,7 @@
   </div>
 
   <header class="room-nav">
-    <a class="brand room-brand" href="/" aria-label="返回同频首页">
+    <a class="brand room-brand" href="/" aria-label="返回同频观影首页">
       <span class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 40 40" fill="none">
           <circle cx="20" cy="20" r="18.5" stroke="currentColor" stroke-opacity=".34"/>
@@ -55,7 +61,7 @@
         </svg>
       </span>
       <span class="brand-word">
-        <strong>同频</strong>
+        <strong>同频观影</strong>
         <small>PRIVATE CINEMA</small>
       </span>
     </a>
@@ -330,7 +336,7 @@
   </main>
 
   <footer class="room-footer">
-    <span>同频 · PRIVATE CINEMA</span>
+    <span>同频观影 · PRIVATE CINEMA</span>
     <span class="room-footer-center"><i></i> 只同步进度，不搬运电影</span>
     <span>ROOM <b id="footer-room-code">------</b></span>
   </footer>
@@ -447,7 +453,7 @@
       <h2 id="help-title">两个人，同一部电影，同一秒。</h2>
       <ol class="help-steps">
         <li><span>01</span><div><strong>各自载入同一部片</strong><p>你们可以在各自设备上打开同一个本地文件，或者粘贴同一个视频链接。影片不会上传或转码。</p></div></li>
-        <li><span>02</span><div><strong>片源自动核对</strong><p>同频会比对文件指纹与时长。确认一致后，同步会更可靠。</p></div></li>
+        <li><span>02</span><div><strong>片源自动核对</strong><p>同频观影会比对文件指纹与时长。确认一致后，同步会更可靠。</p></div></li>
         <li><span>03</span><div><strong>任意一方操作，双方同步</strong><p>播放、暂停、拖动进度都会实时同步；每 3 秒还会自动检测并校准偏差。</p></div></li>
       </ol>
       <div class="help-callout">

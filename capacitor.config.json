@@ -1,0 +1,28 @@
+{
+  "appId": "com.samehz.app",
+  "appName": "同频观影",
+  "webDir": "public",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#0b0a09"
+  },
+  "ios": {
+    "backgroundColor": "#0b0a09",
+    "contentInset": "always",
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "capacitor",
+    "cleartext": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "backgroundColor": "#0b0a09",
+      "showSpinner": false,
+      "launchAutoHide": true,
+      "launchShowDuration": 900
+    }
+  }
+}

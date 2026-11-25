@@ -41,7 +41,7 @@ function check(name, condition, detail = '') {
 
     /* ---------- llms.txt ---------- */
     const llms = await fetch(`${BASE}/llms.txt`).then((r) => r.text());
-    check('llms.txt has title', llms.startsWith('# 同频 SameHz'), llms.slice(0, 30));
+    check('llms.txt has title', llms.startsWith('# 同频观影 SameHz'), llms.slice(0, 30));
     check('llms.txt has summary', llms.includes('> '), '');
     check('llms.txt states free', /免费/.test(llms));
     check('llms.txt lists sources', /B站/.test(llms) && /YouTube/.test(llms));
@@ -52,7 +52,7 @@ function check(name, condition, detail = '') {
 
     const title = await page.title();
     check('title contains core keyword', /异地恋一起看电影/.test(title), title);
-    check('title contains brand', /同频|SameHz/.test(title), title);
+    check('title contains brand', /同频观影|SameHz/.test(title), title);
 
     const description = await page.locator('meta[name="description"]').getAttribute('content');
     check('description is substantial', description.length > 80 && description.length < 300, String(description.length));
