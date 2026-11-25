@@ -2,6 +2,10 @@
 
 (() => {
   const t = (key, params) => (window.I18N ? window.I18N.t(key, params) : key);
+  const env = window.SAMEHZ || { native: false, apiBase: '', publicOrigin: location.origin };
+  const api = (path) => `${env.apiBase}${path}`;
+  // 原生 App 内没有服务端路由，改用 hash 形式进入房间
+  const roomPath = (roomId) => (env.native ? `/room.html#${roomId}` : `/room/${roomId}`);
 
   const form = document.getElementById('start-form');
   const nicknameInput = document.getElementById('nickname');
@@ -127,7 +131,7 @@
     setLoading(true);
     try {
       if (mode === 'create') {
-        const response = await fetch('/api/rooms', {
+        const response = await fetch(api('/api/rooms'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name }),
@@ -135,17 +139,17 @@
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || t('放映室没有创建成功，请稍后再试。'));
         saveName(name);
-        location.href = `/room/${data.roomId}`;
+        location.href = roomPath(data.roomId);
         return;
       }
 
-      const response = await fetch(`/api/rooms/${roomCode}`, { headers: { Accept: 'application/json' } });
+      const response = await fetch(api(`/api/rooms/${roomCode}`), { headers: { Accept: 'application/json' } });
       const data = await response.json().catch(() => ({}));
       if (response.status === 404) throw new Error(t('没有找到这间放映室，房间码可能过期了。'));
       if (!response.ok) throw new Error(data.error || t('暂时无法加入，请稍后再试。'));
       if (data.participants >= data.capacity) throw new Error(t('放映室已经满员了，只容得下两个人。'));
       saveName(name);
-      location.href = `/room/${data.roomId}`;
+      location.href = roomPath(data.roomId);
     } catch (error) {
       setLoading(false);
       showError(error.message || t('网络似乎走神了，请再试一次。'));

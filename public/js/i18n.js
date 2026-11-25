@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 同频 · SameHz — 中英文双语运行时
+ * 同频观影 · SameHz — 中英文双语运行时
  *
  * 设计要点：
  *  - 字典以「中文原文」为键，英文为目标。中文模式下 t() 原样返回，零风险。
@@ -14,9 +14,9 @@
 
   const EN = {
     /* ---------------- 通用 ---------------- */
-    '同频': 'SameHz',
-    '同频首页': 'SameHz home',
-    '返回同频首页': 'Back to SameHz home',
+    '同频观影': 'SameHz',
+    '同频观影首页': 'SameHz home',
+    '返回同频观影首页': 'Back to SameHz home',
     '返回首页': 'Back to home',
     '放映室': 'Screening room',
     '复制房间码': 'Copy room code',
@@ -47,9 +47,9 @@
     '海报生成失败，请重试': 'Could not create the poster, please retry',
     '海报功能没有加载成功，请刷新页面再试': 'Poster feature failed to load — please refresh',
     '你': 'You',
-    '同频 · 私人放映室': 'SameHz · Private screening room',
+    '同频观影 · 私人放映室': 'SameHz · Private screening room',
     '来和我一起看电影吧，房间码 {code}': "Come watch a film with me — room code {code}",
-    '放映室 {code} · 同频': 'Room {code} · SameHz',
+    '放映室 {code} · 同频观影': 'Room {code} · SameHz',
     '自动校准了 {seconds} 秒偏差': 'Auto-corrected {seconds}s of drift',
     '播放链接': 'Play this link',
     '复制失败，请手动选择复制': 'Copy failed — please copy it manually',
@@ -57,8 +57,8 @@
     '房间码已复制': 'Room code copied',
 
     /* ---------------- 首页 ---------------- */
-    '同频 · 隔着山海，一起看同一帧': 'SameHz · The same frame, wherever you are',
-    '同频，一间只属于两个人的同步放映室。各自打开本地片源，播放、暂停、进度实时同步，不压缩画质，不上传影片。':
+    '同频观影 · 隔着山海，一起看同一帧': 'SameHz · The same frame, wherever you are',
+    '同频观影，一间只属于两个人的同步放映室。各自打开本地片源，播放、暂停、进度实时同步，不压缩画质，不上传影片。':
       'SameHz is a private sync cinema for two. Each of you loads the same film — play, pause and progress stay in sync, with no compression and no uploads.',
     '主导航': 'Main navigation',
     '产品特点': 'Highlights',
@@ -68,7 +68,7 @@
     '进入放映室': 'Enter the room',
     '隔着山海，': 'Across any distance,',
     '一起看同一帧。': 'on the very same frame.',
-    '一间只属于你们的同步放映室。各自打开设备里的同一部电影，播放、暂停与进度实时同频——高清原片不压缩，影片也永远不会离开你的设备。':
+    '一间只属于你们的同步放映室。各自打开设备里的同一部电影，播放、暂停与进度实时同频观影——高清原片不压缩，影片也永远不会离开你的设备。':
       'A private screening room for just the two of you. Each of you opens the same film on your own device, while play, pause and progress stay in sync — full quality, no compression, and the file never leaves your device.',
     '影片不上传': 'Nothing uploaded',
     '每 3 秒自动校准': 'Resyncs every 3s',
@@ -107,7 +107,7 @@
       'Either of you can control playback in real time. Auto-correction runs every 3 seconds, and one tap realigns you both.',
     '距离会拉开时间，': 'Distance stretches time,',
     '但不会拉开我们。': 'but it never stretches us.',
-    '— 同频放映室': '— SameHz Cinema',
+    '— 同频观影': '— SameHz Cinema',
     '原片直读': 'Straight from the file',
     '不转码、不压缩。你看到什么画质，TA 就看到什么画质，只取决于你们各自的原片。':
       'No transcoding, no compression. What you see is exactly what they see — limited only by the file you both loaded.',
@@ -135,8 +135,8 @@
     '网络似乎走神了，请再试一次。': 'The network wandered off. Please try again.',
 
     /* ---------------- 放映室 · 静态 ---------------- */
-    '放映室 · 同频': 'Screening room · SameHz',
-    '同频私人同步放映室。两个人，同一部电影，同一秒。':
+    '放映室 · 同频观影': 'Screening room · SameHz',
+    '同频观影私人同步放映室。两个人，同一部电影，同一秒。':
       'SameHz private sync cinema. Two people, one film, one second.',
     '同步放映区': 'Screening stage',
     'YOUR LOCAL COPY': 'YOUR COPY OF THE FILM',
@@ -181,7 +181,7 @@
       "Both sides jump to the room's reference time at once.",
     '放映动态': 'Activity',
     '等一束光，等一个人。': 'Waiting for the light, waiting for someone.',
-    '同频 · PRIVATE CINEMA': 'SameHz · PRIVATE CINEMA',
+    '同频观影 · PRIVATE CINEMA': 'SameHz · PRIVATE CINEMA',
     '只同步进度，不搬运电影': 'We sync progress, never your film',
     '双人专场': 'A SCREENING FOR TWO',
     '今晚，一起看场电影。': "Let's watch a film tonight.",
@@ -202,7 +202,7 @@
     '你们可以在各自设备上打开同一个本地文件，或者粘贴同一个视频链接。影片不会上传或转码。':
       'You can each open the same local file, or paste the same video link. Nothing is uploaded or transcoded.',
     '片源自动核对': 'Source check',
-    '同频会比对文件指纹与时长。确认一致后，同步会更可靠。':
+    '同频观影会比对文件指纹与时长。确认一致后，同步会更可靠。':
       'SameHz compares fingerprint and duration. Once they match, syncing is far more reliable.',
     '任意一方操作，双方同步': 'One controls, both follow',
     '播放、暂停、拖动进度都会实时同步；每 3 秒还会自动检测并校准偏差。':

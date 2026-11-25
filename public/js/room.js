@@ -1,7 +1,13 @@
 'use strict';
 
 (() => {
-  const roomMatch = location.pathname.match(/^\/room\/([A-Za-z0-9]{6})\/?$/);
+  const env = window.SAMEHZ || { native: false, apiBase: '', publicOrigin: location.origin };
+  const api = (path) => `${env.apiBase}${path}`;
+
+  // 网页版用 /room/XXXXXX 路由；原生 App 内没有服务端路由，用 #XXXXXX
+  const pathMatch = location.pathname.match(/^\/room\/([A-Za-z0-9]{6})\/?$/);
+  const hashMatch = location.hash.match(/^#([A-Za-z0-9]{6})$/);
+  const roomMatch = pathMatch || hashMatch;
   if (!roomMatch) {
     location.replace('/');
     return;
@@ -183,7 +189,8 @@
     countdownTimer: null,
   };
 
-  const roomUrl = `${location.origin}/room/${ROOM_ID}`;
+  // 邀请链接始终指向公网站点：即使当前在 App 内，对方也能用浏览器打开
+  const roomUrl = `${env.publicOrigin}/room/${ROOM_ID}`;
   const nameStorage = {
     getSession() {
       try { return sessionStorage.getItem(NAME_KEY) || ''; } catch { return ''; }
@@ -445,10 +452,10 @@
     try {
       const payload = JSON.stringify({ event });
       if (navigator.sendBeacon) {
-        navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }));
+        navigator.sendBeacon(api('/api/track'), new Blob([payload], { type: 'application/json' }));
         return;
       }
-      fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true })
+      fetch(api('/api/track'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true })
         .catch(() => {});
     } catch {
       // 统计失败不影响使用
@@ -464,7 +471,7 @@
   async function shareInvite() {
     trackEvent('invite_shared');
     const shareData = {
-      title: t('同频 · 私人放映室'),
+      title: t('同频观影 · 私人放映室'),
       text: t('来和我一起看电影吧，房间码 {code}', { code: ROOM_ID }),
       url: roomUrl,
     };
@@ -516,7 +523,7 @@
           await Promise.race([
             navigator.share({
               files: [file],
-              title: t('同频 · 私人放映室'),
+              title: t('同频观影 · 私人放映室'),
               text: t('来和我一起看电影吧，房间码 {code}', { code: ROOM_ID }),
             }),
             new Promise((_, reject) => {
@@ -1303,10 +1310,13 @@
       clientId: getClientId(),
       name: state.selfName,
     });
-    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // 原生 App 里 location.host 指向 App 内部，WebSocket 必须连公网服务器
+    const socketOrigin = env.native
+      ? env.publicOrigin.replace(/^http/, 'ws')
+      : `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`;
     let socket;
     try {
-      socket = new WebSocket(`${protocol}//${location.host}/ws?${params.toString()}`);
+      socket = new WebSocket(`${socketOrigin}/ws?${params.toString()}`);
     } catch {
       state.connecting = false;
       scheduleReconnect();
@@ -1782,7 +1792,7 @@
 
     let result;
     try {
-      const response = await fetch('/api/resolve', {
+      const response = await fetch(api('/api/resolve'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: parsed.url }),
@@ -2792,7 +2802,7 @@
     dom.entryRoomCode.textContent = ROOM_ID;
     dom.inviteLinkInput.value = roomUrl;
     dom.roomDate.textContent = formatRoomDate();
-    document.title = t('放映室 {code} · 同频', { code: ROOM_ID });
+    document.title = t('放映室 {code} · 同频观影', { code: ROOM_ID });
 
     state.autoSync = readAutoSync();
     dom.autoSyncToggle.checked = state.autoSync;
@@ -2805,7 +2815,7 @@
 
   function renderTranslations() {
     dom.roomDate.textContent = formatRoomDate();
-    document.title = t('放映室 {code} · 同频', { code: ROOM_ID });
+    document.title = t('放映室 {code} · 同频观影', { code: ROOM_ID });
     if (state.hasVideo) setVideoInfo();
     else resetVideoInfo();
     renderActivity();
