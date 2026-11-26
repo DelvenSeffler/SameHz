@@ -68,7 +68,7 @@
     '进入放映室': 'Enter the room',
     '隔着山海，': 'Across any distance,',
     '一起看同一帧。': 'on the very same frame.',
-    '一间只属于你们的同步放映室。各自打开设备里的同一部电影，播放、暂停与进度实时同频观影——高清原片不压缩，影片也永远不会离开你的设备。':
+    '一间只属于你们的同步放映室。各自打开设备里的同一部电影，播放、暂停与进度实时同步——高清原片不压缩，影片也永远不会离开你的设备。':
       'A private screening room for just the two of you. Each of you opens the same film on your own device, while play, pause and progress stay in sync — full quality, no compression, and the file never leaves your device.',
     '影片不上传': 'Nothing uploaded',
     '每 3 秒自动校准': 'Resyncs every 3s',

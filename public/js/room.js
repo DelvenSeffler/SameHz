@@ -127,10 +127,6 @@
     dialogShare: $('dialog-share'),
     dialogPoster: $('dialog-poster'),
     toastRegion: $('toast-region'),
-    mobileDock: $('mobile-dock'),
-    dockPrimary: $('dock-primary'),
-    dockPrimaryLabel: $('dock-primary-label'),
-    dockInvite: $('dock-invite'),
   };
 
   const state = {
@@ -889,21 +885,6 @@
     if (manualLabel) manualLabel.textContent = t('一键同步进度');
     dom.manualSync.disabled = !state.connected || !state.hasVideo;
     dom.inlineSync.disabled = !state.connected || !state.hasVideo;
-    updateDock();
-  }
-
-  /** 移动端底部操作栏：无片源时引导选片，有片源后变成一键同步 */
-  function updateDock() {
-    if (!dom.dockPrimary || !dom.dockPrimaryLabel) return;
-    if (state.hasVideo) {
-      dom.dockPrimaryLabel.textContent = t('一键同步');
-      setIcon(dom.dockPrimary, '#i-sync');
-      dom.dockPrimary.disabled = !state.connected;
-    } else {
-      dom.dockPrimaryLabel.textContent = t('选择片源');
-      setIcon(dom.dockPrimary, '#i-upload');
-      dom.dockPrimary.disabled = false;
-    }
   }
 
   function updateTimelineUI() {
@@ -2733,17 +2714,6 @@
     dom.dialogCopyLink.addEventListener('click', () => copyWithFeedback(roomUrl, t('邀请链接已复制')));
     dom.dialogCopyCode.addEventListener('click', () => copyWithFeedback(ROOM_ID, t('房间码已复制')));
     dom.dialogShare.addEventListener('click', shareInvite);
-
-    /* 移动端底部操作栏 */
-    if (dom.dockPrimary) {
-      dom.dockPrimary.addEventListener('click', () => {
-        if (state.hasVideo) manualSync();
-        else openSourceDialog();
-      });
-    }
-    if (dom.dockInvite) {
-      dom.dockInvite.addEventListener('click', openInvite);
-    }
     dom.dialogPoster.addEventListener('click', savePoster);
     dom.helpButton.addEventListener('click', () => openModal(dom.helpModal));
 

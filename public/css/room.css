@@ -3685,7 +3685,7 @@ body.modal-open {
 
 @media (max-width: 720px) {
   .room-page {
-    padding-bottom: calc(84px + var(--safe-bottom));
+    padding-bottom: calc(20px + var(--safe-bottom));
   }
 
   /* 顶栏：固定在顶部，毛玻璃，避开状态栏 */
@@ -3739,66 +3739,8 @@ body.modal-open {
     padding: 14px 16px 18px;
   }
 
-  /* 底部固定操作栏：拇指可达区 */
-  .mobile-dock {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 50;
-    display: flex;
-    gap: 10px;
-    padding: 10px 16px calc(10px + var(--safe-bottom));
-    background: linear-gradient(to top, rgba(8, 7, 6, 0.98) 55%, rgba(8, 7, 6, 0.86));
-    backdrop-filter: saturate(160%) blur(20px);
-    -webkit-backdrop-filter: saturate(160%) blur(20px);
-    border-top: 1px solid rgba(244, 236, 223, 0.1);
-  }
-
-  .mobile-dock-button {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    height: 50px;
-    padding: 0 16px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 138, 107, 0.5);
-    background: linear-gradient(135deg, #ff7f5f, #ea5437);
-    color: #1d0e08;
-    font-size: 15px;
-    font-weight: 650;
-    letter-spacing: 0.01em;
-    cursor: pointer;
-    transition: transform 0.15s ease, filter 0.15s ease;
-  }
-
-  .mobile-dock-button:active { transform: scale(0.97); filter: brightness(1.06); }
-
-  .mobile-dock-button.ghost {
-    flex: 0 0 auto;
-    width: 56px;
-    padding: 0;
-    border: 1px solid rgba(244, 236, 223, 0.18);
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--ink-soft);
-  }
-
-  .mobile-dock-button .icon { width: 19px; height: 19px; }
-
-  /* 顶栏在滚动时保持可读，内容不被遮挡 */
-  .room-layout { scroll-margin-top: 64px; }
 }
 
-/* 桌面端不显示底部操作栏 */
-.mobile-dock { display: none; }
-
-@media (max-width: 720px) {
-  .mobile-dock { display: flex; }
-}
-
-.is-native .mobile-dock { display: flex; }
 
 /* 安全区兜底：即使 env() 返回 0 也留出呼吸空间 */
 @media (max-width: 720px) {
@@ -3806,15 +3748,60 @@ body.modal-open {
     padding-top: calc(10px + max(var(--safe-top, 0px), 10px));
   }
 
-  .mobile-dock {
-    padding-bottom: calc(10px + max(var(--safe-bottom, 0px), 8px));
-  }
+
 }
 
 .is-native .room-nav {
   padding-top: calc(10px + max(var(--safe-top, 0px), 14px));
 }
 
-.is-native .mobile-dock {
-  padding-bottom: calc(10px + max(var(--safe-bottom, 0px), 10px));
+
+
+/* 移动端：去掉纯装饰的小字，只留信息 */
+@media (max-width: 720px) {
+  .stage-kicker,
+  .panel-index,
+  .film-overline {
+    display: none !important;
+  }
+
+  .film-details h2 {
+    margin-top: 0;
+  }
+
+  /* 空状态：说明文字收紧 */
+  .empty-copy {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* 顶栏状态只保留圆点，减弱存在感 */
+  .connection-pill {
+    padding: 0 9px;
+    min-height: 32px;
+    font-size: 0;
+    gap: 0;
+  }
+
+  .connection-pill i {
+    margin: 0;
+    width: 8px;
+    height: 8px;
+  }
+
+  .connection-pill.is-connecting i,
+  .connection-pill.is-offline i { display: block; }
+
+  .room-footer {
+    font-size: 11px;
+    opacity: 0.75;
+  }
+}
+
+.is-native .stage-kicker,
+.is-native .panel-index,
+.is-native .film-overline {
+  display: none !important;
 }

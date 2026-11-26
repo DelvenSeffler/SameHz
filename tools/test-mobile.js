@@ -54,12 +54,15 @@ const PHONE = { width: 390, height: 844 };
     check('create form within first screen', formBox && formBox.y + formBox.height < PHONE.height * 2,
       formBox ? `form bottom at ${Math.round(formBox.y + formBox.height)}px` : 'no box');
 
-    /* 触控目标尺寸 */
+    /* 触控目标尺寸（只统计实际可见的控件） */
     const buttonSizes = await page.evaluate(() => {
       const nodes = [...document.querySelectorAll('.primary-button, .mode-tab, .nav-cta')];
-      return nodes.map((el) => Math.round(el.getBoundingClientRect().height));
+      return nodes
+        .filter((el) => el.offsetParent !== null && getComputedStyle(el).display !== 'none')
+        .map((el) => Math.round(el.getBoundingClientRect().height));
     });
-    check('touch targets at least 44px', buttonSizes.every((h) => h >= 44), JSON.stringify(buttonSizes));
+    check('touch targets at least 44px', buttonSizes.length > 0 && buttonSizes.every((h) => h >= 44),
+      JSON.stringify(buttonSizes));
 
     /* 输入框字号 >= 16px，避免 iOS 自动放大 */
     const inputFont = await page.evaluate(() => {
