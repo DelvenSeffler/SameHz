@@ -3672,3 +3672,149 @@ body.modal-open {
 @media (max-width: 720px) {
   .empty-state::after { display: none; }
 }
+
+/* ==========================================================
+   移动端 App 化改造
+   安全区 + 毛玻璃顶栏 + 底部固定操作栏
+   ========================================================== */
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (max-width: 720px) {
+  .room-page {
+    padding-bottom: calc(84px + var(--safe-bottom));
+  }
+
+  /* 顶栏：固定在顶部，毛玻璃，避开状态栏 */
+  .room-nav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    padding: calc(10px + var(--safe-top)) 16px 10px;
+    background: rgba(9, 8, 7, 0.82);
+    backdrop-filter: saturate(160%) blur(18px);
+    -webkit-backdrop-filter: saturate(160%) blur(18px);
+    border-bottom: 1px solid rgba(244, 236, 223, 0.08);
+  }
+
+  .room-brand .brand-mark { width: 30px; height: 30px; }
+  .room-brand .brand-word strong { font-size: 17px; }
+
+  .connection-pill {
+    border-radius: 100px;
+    padding: 0 11px;
+    min-height: 34px;
+    font-size: 12.5px;
+  }
+
+  .room-nav-actions .round-icon-button,
+  .room-nav-actions .lang-toggle.room-lang-toggle {
+    width: 38px;
+    height: 38px;
+    min-height: 38px;
+  }
+
+  /* 主体留白更从容 */
+  .room-layout {
+    padding: 14px 16px 26px;
+    gap: 16px;
+  }
+
+  /* 卡片：更大圆角、更明显的层次 */
+  .side-panel,
+  .cinema-stage,
+  .activity-panel {
+    border-radius: 20px;
+    border-color: rgba(244, 236, 223, 0.1);
+    background: rgba(22, 19, 16, 0.92);
+  }
+
+  .stage-frame { border-radius: 20px 20px 0 0; }
+
+  .film-details {
+    border-radius: 0 0 20px 20px;
+    padding: 14px 16px 18px;
+  }
+
+  /* 底部固定操作栏：拇指可达区 */
+  .mobile-dock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    display: flex;
+    gap: 10px;
+    padding: 10px 16px calc(10px + var(--safe-bottom));
+    background: linear-gradient(to top, rgba(8, 7, 6, 0.98) 55%, rgba(8, 7, 6, 0.86));
+    backdrop-filter: saturate(160%) blur(20px);
+    -webkit-backdrop-filter: saturate(160%) blur(20px);
+    border-top: 1px solid rgba(244, 236, 223, 0.1);
+  }
+
+  .mobile-dock-button {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 50px;
+    padding: 0 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 138, 107, 0.5);
+    background: linear-gradient(135deg, #ff7f5f, #ea5437);
+    color: #1d0e08;
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+
+  .mobile-dock-button:active { transform: scale(0.97); filter: brightness(1.06); }
+
+  .mobile-dock-button.ghost {
+    flex: 0 0 auto;
+    width: 56px;
+    padding: 0;
+    border: 1px solid rgba(244, 236, 223, 0.18);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--ink-soft);
+  }
+
+  .mobile-dock-button .icon { width: 19px; height: 19px; }
+
+  /* 顶栏在滚动时保持可读，内容不被遮挡 */
+  .room-layout { scroll-margin-top: 64px; }
+}
+
+/* 桌面端不显示底部操作栏 */
+.mobile-dock { display: none; }
+
+@media (max-width: 720px) {
+  .mobile-dock { display: flex; }
+}
+
+.is-native .mobile-dock { display: flex; }
+
+/* 安全区兜底：即使 env() 返回 0 也留出呼吸空间 */
+@media (max-width: 720px) {
+  .room-nav {
+    padding-top: calc(10px + max(var(--safe-top, 0px), 10px));
+  }
+
+  .mobile-dock {
+    padding-bottom: calc(10px + max(var(--safe-bottom, 0px), 8px));
+  }
+}
+
+.is-native .room-nav {
+  padding-top: calc(10px + max(var(--safe-top, 0px), 14px));
+}
+
+.is-native .mobile-dock {
+  padding-bottom: calc(10px + max(var(--safe-bottom, 0px), 10px));
+}

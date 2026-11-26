@@ -29,5 +29,25 @@
   // 原生壳一律使用精简布局（即使平板或横屏），由 CSS 的 .is-native 驱动
   if (isNative) {
     document.documentElement.classList.add('is-native');
+
+    // 让 WebView 从状态栏/灵动岛下方开始，避免顶栏被遮挡
+    document.addEventListener('DOMContentLoaded', () => {
+      const plugins = (window.Capacitor && window.Capacitor.Plugins) || {};
+      const statusBar = plugins.StatusBar;
+      if (!statusBar) return;
+      try {
+        if (statusBar.setOverlaysWebView) {
+          statusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
+        }
+        if (statusBar.setStyle) {
+          statusBar.setStyle({ style: 'DARK' }).catch(() => {});
+        }
+        if (statusBar.setBackgroundColor) {
+          statusBar.setBackgroundColor({ color: '#0b0a09' }).catch(() => {});
+        }
+      } catch {
+        // 插件不可用时退回纯 CSS 安全区处理
+      }
+    }, { once: true });
   }
 })();

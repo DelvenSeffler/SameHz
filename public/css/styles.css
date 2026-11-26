@@ -2129,3 +2129,25 @@ svg {
   .feature-index { display: none; }
   .feature-item { padding: 15px 17px; }
 }
+
+/* 移动端首页：安全区与毛玻璃顶栏，贴近原生感 */
+@media (max-width: 720px) {
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    padding-top: calc(10px + max(env(safe-area-inset-top, 0px), 10px));
+    background: rgba(9, 8, 7, 0.82);
+    backdrop-filter: saturate(160%) blur(18px);
+    -webkit-backdrop-filter: saturate(160%) blur(18px);
+    border-bottom: 1px solid rgba(244, 236, 223, 0.07);
+  }
+
+  .site-footer {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.is-native .site-nav {
+  padding-top: calc(10px + max(env(safe-area-inset-top, 0px), 14px));
+}
