@@ -20,7 +20,7 @@
 
   window.SAMEHZ = {
     native: isNative,
-    version: '1.4',
+    version: '1.5',
     /** API 与 WebSocket 的前缀；网页版为空串 */
     apiBase: isNative ? REMOTE_ORIGIN : '',
     /** 邀请链接必须指向公网站点，即使当前运行在 App 内 */
