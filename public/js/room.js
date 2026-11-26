@@ -2795,6 +2795,11 @@
   }
 
   function initRoomIdentity() {
+    // 版本号显示在帮助弹窗底部，方便确认装的是哪一版
+    const versionEl = document.getElementById('app-version');
+    if (versionEl && env.version) {
+      versionEl.textContent = `${env.native ? 'App' : 'Web'} v${env.version}`;
+    }
     dom.roomCodeLabel.textContent = ROOM_ID;
     dom.footerRoomCode.textContent = ROOM_ID;
     dom.inviteCode.textContent = ROOM_ID;

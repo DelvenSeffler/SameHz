@@ -107,7 +107,7 @@ const splashSvg = () => `
   // 通用图标：满幅
   await shoot(iconSvg({ background: true }), 1024, 'icon.png');
   // Android 自适应前景：内容收进中间 66%，透明底
-  await shoot(iconSvg({ background: false, scale: 0.92 }), 1024, 'icon-foreground.png', true);
+  await shoot(iconSvg({ background: false, scale: 0.78 }), 1024, 'icon-foreground.png', true);
   // Android 自适应背景
   await shoot(`<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
       ${DEFS}<rect width="512" height="512" fill="url(#bg)"/></svg>`, 1024, 'icon-background.png');
