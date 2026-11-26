@@ -3906,3 +3906,10 @@ body.modal-open {
   max-width: none;
   margin: 0;
 }
+
+/* 移动端顶栏：连接状态在播放器上方的状态条已有显示，这里不再重复 */
+@media (max-width: 720px) {
+  .room-nav .connection-pill { display: none; }
+}
+
+.is-native .room-nav .connection-pill { display: none; }

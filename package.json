@@ -20,7 +20,8 @@
     "cap:android": "cap open android",
     "cap:ios": "cap open ios",
     "cap:build:android": "cap sync android && cd android && gradlew.bat assembleDebug",
-    "gen:app-icons": "node tools/gen-app-icons.js && cap sync"
+    "gen:app-icons": "node tools/gen-app-icons.js && cap sync",
+    "icons": "node tools/gen-app-icons.js && capacitor-assets generate --iconBackgroundColor \"#0b0a09\" --iconBackgroundColorDark \"#0b0a09\" --splashBackgroundColor \"#0b0a09\" --splashBackgroundColorDark \"#0b0a09\" && node tools/patch-adaptive-icon.js"
   },
   "engines": {
     "node": ">=18"

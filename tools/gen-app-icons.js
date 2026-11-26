@@ -107,7 +107,7 @@ const splashSvg = () => `
   // 通用图标：满幅
   await shoot(iconSvg({ background: true }), 1024, 'icon.png');
   // Android 自适应前景：内容收进中间 66%，透明底
-  await shoot(iconSvg({ background: false, scale: 0.64 }), 1024, 'icon-foreground.png', true);
+  await shoot(iconSvg({ background: false, scale: 0.78 }), 1024, 'icon-foreground.png', true);
   // Android 自适应背景
   await shoot(`<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
       ${DEFS}<rect width="512" height="512" fill="url(#bg)"/></svg>`, 1024, 'icon-background.png');
@@ -116,6 +116,25 @@ const splashSvg = () => `
   await shoot(splashSvg(), 2732, 'splash-dark.png');
 
   await browser.close();
+
+  /*
+   * Capacitor 的素材生成器会给自适应图标的两层各套一个 <inset>，
+   * 等于在安全区之上再缩一次，桌面上看起来就是「图标很小」。
+   * 这里把生成的 XML 改回纯粹的两层引用，让前景按 66% 安全区直接呈现。
+   */
+  const adaptiveXml = `<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>
+`;
+  for (const file of ['ic_launcher.xml', 'ic_launcher_round.xml']) {
+    const target = path.join('android', 'app', 'src', 'main', 'res', 'mipmap-anydpi-v26', file);
+    if (fs.existsSync(target)) {
+      fs.writeFileSync(target, adaptiveXml, 'utf8');
+      console.log('✓ patched', target);
+    }
+  }
 })().catch((error) => {
   console.error(error.message);
   process.exit(1);
