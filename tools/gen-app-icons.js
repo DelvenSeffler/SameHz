@@ -48,18 +48,18 @@ const DEFS = `
  * 图标主体。scale 用于把内容收进 Android 自适应图标安全区。
  */
 function mark({ scale = 1, withGlow = true } = {}) {
-  const tri = 96;          // 播放键高度
+  const tri = 116;         // 播放键高度
   const half = tri / 2;
   const w = tri * 0.84;
   const x = C - w * 0.36;
   const y = C - half;
   return `
   <g transform="translate(${C} ${C}) scale(${scale}) translate(${-C} ${-C})">
-    ${withGlow ? `<circle cx="${C}" cy="${C}" r="150" fill="url(#warm)"/>` : ''}
-    <circle cx="${C}" cy="${C}" r="186" fill="none" stroke="url(#ringOuter)" stroke-width="7"/>
-    <circle cx="${C}" cy="${C}" r="152" fill="none" stroke="#ff8f72" stroke-opacity=".42" stroke-width="6"
+    ${withGlow ? `<circle cx="${C}" cy="${C}" r="176" fill="url(#warm)"/>` : ''}
+    <circle cx="${C}" cy="${C}" r="218" fill="none" stroke="url(#ringOuter)" stroke-width="8"/>
+    <circle cx="${C}" cy="${C}" r="178" fill="none" stroke="#ff8f72" stroke-opacity=".42" stroke-width="7"
             stroke-linecap="round" stroke-dasharray="3 14"/>
-    <circle cx="${C}" cy="${C}" r="106" fill="url(#disc)"/>
+    <circle cx="${C}" cy="${C}" r="128" fill="url(#disc)"/>
     <path d="M${x} ${y} L${x + w} ${C} L${x} ${y + tri} Z"
           fill="#fffaf6" stroke="#fffaf6" stroke-width="11" stroke-linejoin="round"/>
   </g>`;

@@ -3812,22 +3812,6 @@ body.modal-open {
    ========================================================== */
 
 @media (max-width: 720px) {
-  /* 品牌标与图标按钮放大 */
-  .room-brand .brand-mark { width: 40px; height: 40px; }
-  .room-brand .brand-word strong { font-size: 19px; }
-
-  .room-nav-actions .round-icon-button,
-  .room-nav-actions .lang-toggle.room-lang-toggle {
-    width: 44px;
-    height: 44px;
-    min-height: 44px;
-  }
-
-  .room-nav-actions .round-icon-button .icon,
-  .room-nav-actions .lang-toggle .icon { width: 21px; height: 21px; }
-
-  .room-nav-actions .nav-ghost-button { width: 44px; height: 44px; min-height: 44px; }
-  .room-nav-actions .nav-ghost-button .icon { width: 21px; height: 21px; }
 
   /* 播放器：贴合手机竖屏比例，留白更从容 */
   .stage-frame {
@@ -3887,13 +3871,9 @@ body.modal-open {
   .switch-row small { font-size: 12.5px; }
 
   /* 弹窗内图标与按钮 */
-  .dialog-primary .icon,
-  .dialog-secondary .icon { width: 19px; height: 19px; }
 
-  .dialog-poster-button .icon { width: 19px; height: 19px; }
 }
 
-.is-native .room-brand .brand-mark { width: 42px; height: 42px; }
 
 /* 移动端布局宽度修正：桌面版留了 64px 边距，手机上不该浪费 */
 @media (max-width: 720px) {

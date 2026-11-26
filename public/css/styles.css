@@ -2278,12 +2278,3 @@ svg {
 /* 原生壳同样折叠 */
 .is-native .faq-section { display: block !important; }
 
-/* 移动端图标放大：品牌标与导航图标 */
-@media (max-width: 720px) {
-  .brand-mark { width: 42px; height: 42px; }
-  .brand-word strong { font-size: 20px; }
-  .brand-word small { font-size: 11px; }
-  .lang-toggle { min-width: 48px; height: 42px; font-size: 12px; }
-}
-
-.is-native .brand-mark { width: 44px; height: 44px; }
