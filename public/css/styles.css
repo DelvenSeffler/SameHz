@@ -2207,3 +2207,83 @@ svg {
   .nav-cta { display: none; }
   .nav-actions { margin-left: auto; }
 }
+
+/* ==========================================================
+   FAQ 折叠：桌面端保持展开且隐藏标题把手，移动端可点开
+   ========================================================== */
+
+.faq-disclosure { border: 0; }
+
+/* 桌面：去掉 summary 的默认三角与手型，视觉上等同普通标题 */
+.faq-summary {
+  display: block;
+  list-style: none;
+  cursor: default;
+  pointer-events: none;
+}
+
+.faq-summary::-webkit-details-marker { display: none; }
+.faq-summary::marker { content: ''; }
+
+.faq-chevron { display: none; }
+
+.faq-body { display: block; }
+
+@media (max-width: 720px) {
+  .faq-section {
+    display: block !important;
+    padding: 26px 0 34px;
+    border-top: 1px solid var(--line);
+  }
+
+  .faq-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .faq-summary .section-kicker { display: none; }
+
+  .faq-summary h2 {
+    flex: 1;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .faq-chevron {
+    display: block;
+    width: 20px;
+    height: 20px;
+    color: var(--muted);
+    transition: transform 0.25s var(--ease-out);
+  }
+
+  .faq-disclosure[open] .faq-chevron { transform: rotate(180deg); }
+
+  .faq-body {
+    padding-top: 18px;
+  }
+
+  .faq-summary:active { background: rgba(255, 255, 255, 0.06); }
+}
+
+/* 原生壳同样折叠 */
+.is-native .faq-section { display: block !important; }
+
+/* 移动端图标放大：品牌标与导航图标 */
+@media (max-width: 720px) {
+  .brand-mark { width: 42px; height: 42px; }
+  .brand-word strong { font-size: 20px; }
+  .brand-word small { font-size: 11px; }
+  .lang-toggle { min-width: 48px; height: 42px; font-size: 12px; }
+}
+
+.is-native .brand-mark { width: 44px; height: 44px; }

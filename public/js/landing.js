@@ -163,4 +163,12 @@
       clearError();
     });
   }
+
+  /* FAQ 折叠：手机与原生壳默认收起，桌面保持展开（内容始终在 DOM 中，利于收录） */
+  const disclosure = document.getElementById('faq-disclosure');
+  if (disclosure) {
+    const compact = window.matchMedia('(max-width: 720px)').matches
+      || Boolean(window.SAMEHZ && window.SAMEHZ.native);
+    if (compact) disclosure.open = false;
+  }
 })();

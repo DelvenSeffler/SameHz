@@ -3805,3 +3805,124 @@ body.modal-open {
 .is-native .film-overline {
   display: none !important;
 }
+
+/* ==========================================================
+   移动端比例与呼吸感
+   图标放大、间距放宽、播放器贴合手机屏比
+   ========================================================== */
+
+@media (max-width: 720px) {
+  /* 品牌标与图标按钮放大 */
+  .room-brand .brand-mark { width: 40px; height: 40px; }
+  .room-brand .brand-word strong { font-size: 19px; }
+
+  .room-nav-actions .round-icon-button,
+  .room-nav-actions .lang-toggle.room-lang-toggle {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+
+  .room-nav-actions .round-icon-button .icon,
+  .room-nav-actions .lang-toggle .icon { width: 21px; height: 21px; }
+
+  .room-nav-actions .nav-ghost-button { width: 44px; height: 44px; min-height: 44px; }
+  .room-nav-actions .nav-ghost-button .icon { width: 21px; height: 21px; }
+
+  /* 播放器：贴合手机竖屏比例，留白更从容 */
+  .stage-frame {
+    border-radius: 22px 22px 0 0;
+  }
+
+  .stage-frame:not(.has-video) {
+    aspect-ratio: auto;
+    min-height: clamp(360px, 52vh, 460px);
+  }
+
+  .stage-frame.has-video {
+    aspect-ratio: 9 / 12.5;
+    min-height: 0;
+  }
+
+  /* 卡片间距与内边距放宽，缓解拥挤 */
+  .room-layout {
+    padding: 16px 16px 32px;
+    gap: 20px;
+  }
+
+  .side-panel,
+  .activity-panel {
+    padding: 18px 18px 20px;
+    border-radius: 22px;
+  }
+
+  .film-details {
+    padding: 16px 18px 20px;
+  }
+
+  .panel-heading { margin-bottom: 14px; }
+  .panel-heading h2 { font-size: 16px; }
+
+  /* 房间码更醒目 */
+  .invite-code-row { margin: 10px 0 14px; }
+  .invite-code { font-size: 30px; letter-spacing: 0.18em; }
+
+  /* 参与者行更高，好点 */
+  .participant { padding: 12px 14px; border-radius: 14px; }
+  .participant-name { font-size: 15px; }
+  .participant-status { font-size: 12.5px; }
+
+  /* 一键同步加大，成为视觉重心 */
+  .manual-sync-button {
+    min-height: 72px;
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+
+  .manual-sync-copy strong { font-size: 16px; }
+  .manual-sync-copy small { font-size: 13px; }
+
+  .switch-row { padding: 14px 0 6px; }
+  .switch-row > span:first-child { font-size: 15px; }
+  .switch-row small { font-size: 12.5px; }
+
+  /* 弹窗内图标与按钮 */
+  .dialog-primary .icon,
+  .dialog-secondary .icon { width: 19px; height: 19px; }
+
+  .dialog-poster-button .icon { width: 19px; height: 19px; }
+}
+
+.is-native .room-brand .brand-mark { width: 42px; height: 42px; }
+
+/* 移动端布局宽度修正：桌面版留了 64px 边距，手机上不该浪费 */
+@media (max-width: 720px) {
+  .room-layout {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 14px 14px 34px;
+    gap: 20px;
+  }
+
+  .cinema-stage,
+  .side-column,
+  .activity-panel {
+    width: 100%;
+  }
+
+  /* 播放器：空状态接近方形，有视频时按 16:9 */
+  .stage-frame:not(.has-video) {
+    min-height: clamp(380px, 54vh, 470px);
+  }
+
+  .stage-frame.has-video {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.is-native .room-layout {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
