@@ -3913,3 +3913,18 @@ body.modal-open {
 }
 
 .is-native .room-nav .connection-pill { display: none; }
+
+/* 移动端顶栏满宽，避免左右露出底色 */
+@media (max-width: 720px) {
+  .room-nav {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+}
+
+.is-native .room-nav {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}

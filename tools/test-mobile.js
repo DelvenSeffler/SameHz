@@ -82,7 +82,8 @@ const PHONE = { width: 390, height: 844 };
     await page.tap('#submit-button');
     await page.waitForURL(/\/room\/[A-Z0-9]{6}$/, { timeout: 20000 });
     const roomId = page.url().split('/').pop();
-    await page.waitForSelector('#connection-pill:not(.is-connecting)', { timeout: 20000 });
+    // 移动端顶栏不显示连接状态，用播放器上的状态条判断就绪
+    await page.waitForSelector('.screen-sync-pill', { timeout: 20000 });
     check('room created on phone', /^[A-Z0-9]{6}$/.test(roomId), roomId);
 
     await page.waitForSelector('.empty-inner', { timeout: 8000 });
