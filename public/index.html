@@ -179,13 +179,13 @@
   <main>
     <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow"><span class="live-dot"></span> A PRIVATE SCREENING FOR TWO</p>
+        <p class="eyebrow" data-desktop-only><span class="live-dot"></span> A PRIVATE SCREENING FOR TWO</p>
         <h1>隔着山海，<br><em>一起看同一帧。</em></h1>
         <p class="hero-lead">
           一间只属于你们的同步放映室。各自打开设备里的同一部电影，
           播放、暂停与进度实时同频观影——高清原片不压缩，影片也永远不会离开你的设备。
         </p>
-        <div class="hero-notes" aria-label="产品特点">
+        <div class="hero-notes" aria-label="产品特点" data-desktop-only>
           <span>
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.8 13.2 4v4.1c0 3-2.2 5.2-5.2 6.2-3-1-5.2-3.2-5.2-6.2V4L8 1.8Z" stroke="currentColor" stroke-width="1.2"/><path d="m5.8 8 1.5 1.5 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             影片不上传
@@ -200,7 +200,7 @@
           </span>
         </div>
 
-        <div class="ticket-stub" aria-hidden="true">
+        <div class="ticket-stub" aria-hidden="true" data-desktop-only>
           <span class="stub-line"></span>
           <span class="stub-label">ADMIT TWO · 只此二人</span>
           <span class="stub-code">SYNC / ∞</span>
@@ -259,7 +259,7 @@
       </section>
     </section>
 
-    <section class="sync-window" aria-labelledby="sync-window-title">
+    <section class="sync-window" aria-labelledby="sync-window-title" data-desktop-only>
       <div class="sync-window-copy">
         <p class="section-kicker">SAME MOMENT, SAME FRAME</p>
         <h2 id="sync-window-title">进度，总在<br><em>同一秒。</em></h2>
@@ -338,7 +338,7 @@
     </section>
 
     <section class="feature-band" id="features" aria-labelledby="feature-title">
-      <div class="feature-quote">
+      <div class="feature-quote" data-desktop-only>
         <span class="quote-mark">“</span>
         <blockquote id="feature-title">距离会拉开时间，<br>但不会拉开我们。</blockquote>
         <p>— 同频观影</p>
@@ -399,24 +399,24 @@
           <tbody>
             <tr>
               <th scope="row">屏幕共享（腾讯会议 / Discord）</th>
-              <td>压缩后画质，通常 720p 以下</td>
-              <td>高，按视频码率持续上传</td>
-              <td>靠盯屏幕，容易错位</td>
-              <td>发起方电脑必须一直开着</td>
+              <td data-label="画质">压缩后画质，通常 720p 以下</td>
+              <td data-label="流量消耗">高，按视频码率持续上传</td>
+              <td data-label="进度同步">靠盯屏幕，容易错位</td>
+              <td data-label="片源限制">发起方电脑必须一直开着</td>
             </tr>
             <tr>
               <th scope="row">视频平台的「一起看」</th>
-              <td>平台提供什么就是什么</td>
-              <td>无额外消耗</td>
-              <td>有</td>
-              <td>只能看平台有的内容，通常要会员</td>
+              <td data-label="画质">平台提供什么就是什么</td>
+              <td data-label="流量消耗">无额外消耗</td>
+              <td data-label="进度同步">支持同步</td>
+              <td data-label="片源限制">只能看平台有的内容，通常要会员</td>
             </tr>
             <tr class="is-highlight">
               <th scope="row">同频观影 SameHz</th>
-              <td>各自的原始画质，不压缩</td>
-              <td>几乎为零，只传播放状态</td>
-              <td>每 3 秒自动校准</td>
-              <td>你自己有的片源、B站链接、直链都能放</td>
+              <td data-label="画质">各自的原始画质，不压缩</td>
+              <td data-label="流量消耗">几乎为零，只传播放状态</td>
+              <td data-label="进度同步">每 3 秒自动校准</td>
+              <td data-label="片源限制">你自己有的片源、B站链接、直链都能放</td>
             </tr>
           </tbody>
         </table>

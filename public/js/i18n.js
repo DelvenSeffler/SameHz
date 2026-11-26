@@ -134,6 +134,47 @@
     '放映室已经满员了，只容得下两个人。': 'This room is full — it only holds two.',
     '网络似乎走神了，请再试一次。': 'The network wandered off. Please try again.',
 
+    /* ---------------- 首页 · 常见问题与对比 ---------------- */
+    '常见问题': 'Frequently asked questions',
+    '异地恋一起看电影的几种方式对比': 'How the common ways of watching together compare',
+    '方式': 'Approach',
+    '画质': 'Picture quality',
+    '流量消耗': 'Data use',
+    '进度同步': 'Progress sync',
+    '片源限制': 'Source limits',
+    '屏幕共享（腾讯会议 / Discord）': 'Screen sharing (Tencent Meeting / Discord)',
+    '压缩后画质，通常 720p 以下': 'Compressed, usually below 720p',
+    '高，按视频码率持续上传': 'High — sustained upload at the video bitrate',
+    '靠盯屏幕，容易错位': 'Eyeballed, drifts easily',
+    '发起方电脑必须一直开着': "The host's computer must stay on",
+    '视频平台的「一起看」': 'Watch-together built into a video platform',
+    '平台提供什么就是什么': 'Whatever the platform offers',
+    '无额外消耗': 'No extra data',
+    '只能看平台有的内容，通常要会员': 'Only that platform’s catalogue, usually behind a subscription',
+    '各自的原始画质，不压缩': 'Each of you keeps the original quality, uncompressed',
+    '几乎为零，只传播放状态': 'Almost zero — only playback state travels',
+    '每 3 秒自动校准': 'Corrected every 3 seconds',
+    '支持同步': 'Yes',
+    '你自己有的片源、B站链接、直链都能放': 'Your own files, Bilibili links and direct links all work',
+    '异地恋怎么一起看电影？': 'How can we watch a film together when we are apart?',
+    '两个人各自在自己设备上打开同一部电影，用同频观影同步播放进度即可。一方播放、暂停或拖动进度，另一方的画面会跟着同步，每 3 秒自动校准一次偏差。影片留在各自设备上，不需要上传，也不压缩画质。':
+      'Each of you opens the same film on your own device, then SameHz keeps the two playheads together. When one person plays, pauses or scrubs, the other screen follows, and any drift is corrected every three seconds. The file stays on your device — nothing is uploaded and nothing is compressed.',
+    '同频观影需要付费吗？': 'Does SameHz cost anything?',
+    '免费。目前所有功能免费使用，无需注册账号，打开网页创建房间就能用。':
+      'It is free. Every feature is available at no cost, there is no account to create, and you can start from the web page right away.',
+    '影片会被上传到服务器吗？': 'Is my video uploaded to a server?',
+    '不会。服务器只传递播放状态（第几秒在播放），视频文件始终留在你自己的设备上，或者由浏览器直接从源站加载。':
+      'No. The server only relays playback state — which second you are at. The video file always stays on your own device, or is loaded straight from the source site by your browser.',
+    '支持 B站和 YouTube 吗？': 'Does it work with Bilibili and YouTube?',
+    '支持。粘贴 B站或 YouTube 的视频链接，双方会自动载入同一条链接并同步播放。B站免登录链接的清晰度上限为 720p。':
+      'Yes. Paste a Bilibili or YouTube link and the other person loads the same link automatically, with playback kept in sync. Bilibili links top out at 720p without a signed-in account.',
+    '可以在手机上和对方一起看吗？': 'Can we watch together on our phones?',
+    '可以。同频观影是网页工具，手机浏览器打开就能用，一台手机一台电脑也可以同步。':
+      'Yes. SameHz runs in a phone browser, and one phone watching with one laptop works just as well.',
+    '和屏幕共享有什么不同？': 'How is this different from sharing my screen?',
+    '屏幕共享会把画面压缩后传给对方，画质下降、占用大量带宽。同频观影不传画面，只同步「播到第几秒」，所以两边都是各自的原始画质，也不消耗流量。':
+      'Screen sharing compresses the picture and sends it to the other person, which costs quality and a lot of bandwidth. SameHz never sends the picture — only the playhead — so both of you keep full quality and nothing is streamed twice.',
+
     /* ---------------- 放映室 · 静态 ---------------- */
     '放映室 · 同频观影': 'Screening room · SameHz',
     '同频观影私人同步放映室。两个人，同一部电影，同一秒。':

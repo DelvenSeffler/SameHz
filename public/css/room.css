@@ -3337,3 +3337,338 @@ body.modal-open {
   border-color: rgba(255, 138, 107, 0.75);
   background: rgba(255, 138, 107, 0.12);
 }
+
+/* ==========================================================
+   移动端 / 原生 App 精简布局
+   目标：播放器优先，一屏内能选片、能一键同步
+   ========================================================== */
+
+.is-native [data-desktop-only] { display: none !important; }
+
+@media (max-width: 720px) {
+  [data-desktop-only] { display: none !important; }
+
+  .room-page { padding-bottom: env(safe-area-inset-bottom, 0); }
+
+  /* 顶部：品牌 + 房间码 + 状态，一行放得下 */
+  .room-nav {
+    padding: 12px 14px;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .room-brand .brand-word strong { font-size: 18px; }
+  .room-brand .brand-word small { display: none; }
+  .room-brand .brand-mark { width: 32px; height: 32px; }
+
+  .room-meta { gap: 6px; }
+  .room-label,
+  .room-date,
+  .room-meta-divider { display: none; }
+
+  .room-code-chip {
+    min-height: 38px;
+    padding: 0 11px;
+    font-size: 13px;
+  }
+
+  .room-nav-actions { gap: 6px; }
+
+  .connection-pill {
+    padding: 0 10px;
+    min-height: 38px;
+    font-size: 12px;
+  }
+
+  .room-nav-actions .nav-ghost-button span { display: none; }
+  .room-nav-actions .nav-ghost-button {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+    min-height: 40px;
+  }
+
+  .round-icon-button { width: 40px; height: 40px; min-height: 40px; }
+  .lang-toggle.room-lang-toggle { min-width: 38px; height: 40px; }
+
+  /* 播放器占满，去掉多余留白 */
+  .room-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 12px 14px 20px;
+  }
+
+  .cinema-stage { border-radius: 14px; }
+
+  .stage-frame {
+    aspect-ratio: 16 / 10;
+    border-radius: 14px 14px 0 0;
+  }
+
+  /* 舞台顶栏：只留同步状态和更换片源 */
+  .screen-topbar {
+    padding: 8px 10px;
+  }
+
+  .screen-sync-pill { font-size: 12px; padding: 5px 10px; }
+  .peer-indicator { display: none; }
+  .screen-action { min-height: 34px; font-size: 12px; padding: 0 10px; }
+
+  /* 播放控件：加大点击区域 */
+  .video-controls { padding: 10px 12px 12px; }
+  .control-row { gap: 8px; }
+  .control-button { width: 42px; height: 42px; }
+  .play-control { width: 50px; height: 50px; }
+  .control-time { font-size: 12px; }
+  .volume-control input { display: none; }
+  .drift-readout { font-size: 12px; padding: 5px 9px; }
+  .inline-sync-button { min-height: 38px; font-size: 12.5px; padding: 0 12px; }
+
+  /* 片源信息：只留片名 + 一句话 */
+  .film-details {
+    padding: 12px 14px 14px;
+    gap: 10px;
+  }
+
+  .film-overline { font-size: 12px; }
+  .film-details h2 { font-size: 18px; margin-top: 4px; }
+  .film-subline { font-size: 12.5px; margin-top: 4px; }
+
+  .match-badge {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .match-badge-copy strong { font-size: 13.5px; }
+  .match-badge-copy small { font-size: 12px; }
+
+  /* 空状态：按钮大而清楚 */
+  .empty-inner { padding: 26px 20px; }
+  .empty-inner h1 { font-size: 26px; line-height: 1.25; }
+  .empty-copy { font-size: 13.5px; margin: 10px 0 18px; }
+
+  .accent-action {
+    width: 100%;
+    justify-content: center;
+    min-height: 50px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+
+  .ghost-action {
+    width: 100%;
+    justify-content: center;
+    min-height: 46px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  .drag-hint { display: none; }
+  .privacy-mini { font-size: 12px; margin-top: 12px; justify-content: center; }
+
+  /* 侧栏：面板压缩，去掉装饰 */
+  .side-column { gap: 12px; }
+
+  .side-panel {
+    padding: 14px 15px;
+    border-radius: 14px;
+  }
+
+  .panel-heading { margin-bottom: 10px; }
+  .panel-heading h2 { font-size: 15px; }
+  .panel-index, .seat-count, .auto-chip, .live-chip { font-size: 12px; }
+
+  .invite-code-row { margin: 8px 0 10px; }
+  .invite-code { font-size: 26px; letter-spacing: 0.16em; }
+
+  .invite-actions { gap: 8px; }
+  .invite-primary { min-height: 46px; font-size: 14px; }
+  .invite-secondary { min-height: 46px; width: 46px; }
+
+  .panel-hint { font-size: 12.5px; }
+
+  .participant { padding: 9px 11px; }
+  .participant-name { font-size: 14.5px; }
+  .participant-status { font-size: 12px; }
+  .participant-tag { font-size: 11.5px; padding: 3px 8px; }
+
+  /* 一键同步：移动端最重要的按钮，做大 */
+  .manual-sync-button {
+    min-height: 64px;
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+
+  .manual-sync-copy strong { font-size: 15px; }
+  .manual-sync-copy small { font-size: 12.5px; }
+
+  .switch-row {
+    padding: 12px 0 4px;
+  }
+
+  .switch-row > span:first-child { font-size: 14px; }
+  .switch-row small { font-size: 12px; }
+
+  /* 动态：限高，避免无限拉长页面 */
+  .activity-panel { padding: 14px 15px; }
+
+  .activity-list {
+    max-height: 168px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .activity-item { font-size: 12.5px; }
+
+  .room-footer {
+    padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0));
+    font-size: 11.5px;
+  }
+
+  .room-footer-center { display: none; }
+
+  /* 弹窗：接近全屏，按钮易点 */
+  .dialog-card,
+  .entry-card {
+    width: calc(100% - 24px);
+    max-width: 440px;
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    padding: 22px 18px;
+    border-radius: 16px;
+  }
+
+  .dialog-card h2,
+  .entry-card h1 { font-size: 21px; }
+
+  .dialog-primary,
+  .dialog-secondary,
+  .entry-submit,
+  .dialog-poster-button {
+    min-height: 48px;
+    font-size: 14.5px;
+  }
+
+  .invite-link-field input,
+  .entry-field input,
+  .source-dialog .invite-link-field input {
+    height: 48px;
+    font-size: 16px;
+  }
+
+  .countdown-card strong { font-size: 64px; }
+}
+
+@media (max-width: 400px) {
+  .empty-inner h1 { font-size: 23px; }
+  .invite-code { font-size: 22px; }
+  .play-control { width: 46px; height: 46px; }
+  .control-button { width: 38px; height: 38px; }
+}
+
+/* 移动端修正：顶栏不重叠、播放器高度自适应内容 */
+@media (max-width: 720px) {
+  /* 房间码在下方侧栏已大号展示，顶栏不再重复，避免挤压重叠 */
+  .room-code-chip { display: none; }
+
+  .room-meta { display: none; }
+
+  .room-nav {
+    justify-content: space-between;
+    overflow: hidden;
+  }
+
+  .room-brand {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .room-brand .brand-word { min-width: 0; }
+  .room-brand .brand-word strong {
+    font-size: 17px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .room-nav-actions {
+    flex: 0 0 auto;
+    gap: 6px;
+  }
+
+  /* 播放器：空状态用最小高度，有视频才锁 16:10 */
+  .stage-frame {
+    aspect-ratio: auto;
+    min-height: 340px;
+  }
+
+  .stage-frame.has-video {
+    aspect-ratio: 16 / 10;
+    min-height: 0;
+  }
+
+  .empty-inner {
+    padding: 22px 18px;
+    gap: 0;
+  }
+
+  .empty-inner h1 {
+    font-size: 24px;
+    line-height: 1.3;
+  }
+
+  .empty-copy {
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 8px 0 16px;
+  }
+
+  .empty-reel { margin-bottom: 12px; transform: scale(0.85); }
+
+  .stage-kicker { font-size: 11px; margin-bottom: 6px; }
+
+  .accent-action { min-height: 48px; font-size: 14.5px; }
+  .ghost-action { min-height: 44px; font-size: 13.5px; margin-top: 8px; }
+
+  .privacy-mini { font-size: 11.5px; margin-top: 10px; }
+
+  /* 加载态也跟随最小高度 */
+  .stage-loading { min-height: 340px; }
+}
+
+/* 移动端：空状态所需高度与内边距 */
+@media (max-width: 720px) {
+  .stage-frame {
+    min-height: 440px;
+  }
+
+  .stage-frame.has-video {
+    aspect-ratio: 16 / 10;
+    min-height: 0;
+  }
+
+  .stage-loading { min-height: 440px; }
+
+  .empty-state {
+    padding: 56px 18px 38px;
+    overflow: visible;
+  }
+
+  .empty-inner {
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .empty-perf { display: none; }
+
+  .empty-reel {
+    transform: scale(0.72);
+    margin-bottom: 4px;
+  }
+}
+
+/* 移动端：隐藏只起装饰作用的英文跑马灯，避免与说明文字重叠 */
+@media (max-width: 720px) {
+  .empty-state::after { display: none; }
+}

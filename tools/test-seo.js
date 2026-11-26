@@ -105,6 +105,29 @@ function check(name, condition, detail = '') {
     check('comparison table rendered', (await page.locator('.compare-table tbody tr').count()) === 3,
       String(await page.locator('.compare-table tbody tr').count()));
 
+    /* ---------- 英文模式下 FAQ 与对比表必须全部翻译 ---------- */
+    const enContext = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'en-US' });
+    const enPage = await enContext.newPage();
+    await enPage.addInitScript(() => { try { localStorage.setItem('tp:lang', 'en'); } catch (e) {} });
+    await enPage.goto(BASE, { waitUntil: 'networkidle' });
+    await enPage.waitForTimeout(500);
+    const enFaq = [
+      ...(await enPage.locator('.faq-item dt').allInnerTexts()),
+      ...(await enPage.locator('.faq-item dd').allInnerTexts()),
+      ...(await enPage.locator('.compare-table thead th').allInnerTexts()),
+      ...(await enPage.locator('.compare-table tbody td').allInnerTexts()),
+      await enPage.locator('.faq-subtitle').innerText(),
+      await enPage.locator('#faq-title').innerText(),
+    ];
+    const leftoverChinese = enFaq.filter((text) => /[\u4e00-\u9fff]/.test(text));
+    check('English FAQ fully translated', leftoverChinese.length === 0,
+      leftoverChinese.slice(0, 3).join(' | ') || 'none');
+    check('English FAQ matches question count',
+      (await enPage.locator('.faq-item dt').count()) === 6,
+      String(await enPage.locator('.faq-item dt').count()));
+    await enPage.screenshot({ path: path.join(SHOTS, 'landing-faq-en.png'), fullPage: true });
+    await enContext.close();
+
     const h1Count = await page.locator('h1').count();
     check('exactly one h1', h1Count === 1, String(h1Count));
 

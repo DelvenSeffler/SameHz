@@ -1903,3 +1903,229 @@ svg {
   .compare-table { min-width: 660px; }
   .faq-list { grid-template-columns: 1fr; gap: 22px; }
 }
+
+/* ==========================================================
+   移动端精简版
+   手机浏览器与原生 App 共用：隐藏装饰性内容，突出「创建房间」
+   ========================================================== */
+
+/* 原生 App 一律走精简布局（即使平板/横屏） */
+.is-native [data-desktop-only] { display: none !important; }
+
+@media (max-width: 720px) {
+  [data-desktop-only] { display: none !important; }
+
+  /* 顶部导航：只留品牌与语言切换 */
+  .site-nav {
+    padding: 14px 0;
+    gap: 10px;
+  }
+
+  .nav-links { display: none; }
+
+  .nav-cta {
+    padding: 9px 14px;
+    font-size: 13px;
+  }
+
+  .nav-actions { gap: 8px; }
+
+  /* 首屏：标题 + 表单，一屏内可操作 */
+  .hero {
+    display: block;
+    padding: 20px 0 40px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(30px, 9vw, 40px);
+    line-height: 1.18;
+  }
+
+  .hero-lead {
+    margin: 12px 0 20px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .start-card {
+    margin-top: 22px;
+    padding: 20px 18px;
+    border-radius: 16px;
+  }
+
+  .start-card-heading h2 { font-size: 21px; }
+  .start-card-heading p { font-size: 13px; }
+
+  .start-card-top { margin-bottom: 12px; }
+
+  /* 触控友好：按钮与输入框 */
+  .primary-button,
+  .mode-tab,
+  .nav-cta,
+  .lang-toggle {
+    min-height: 44px;
+  }
+
+  .field input,
+  .field .input-wrap input {
+    min-height: 46px;
+    font-size: 16px; /* 低于 16px 时 iOS 会自动放大页面 */
+  }
+
+  /* 三步：紧凑单列 */
+  .how-section { padding: 44px 0; }
+
+  .section-heading h2 {
+    font-size: clamp(24px, 7vw, 30px);
+    line-height: 1.25;
+  }
+
+  .section-heading p {
+    margin-top: 10px;
+    font-size: 13.5px;
+  }
+
+  .steps {
+    display: grid;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .step-card {
+    padding: 18px 18px 20px;
+  }
+
+  .step-card h3 { font-size: 17px; }
+  .step-card p { font-size: 13px; line-height: 1.7; }
+
+  /* 特性：单列，只留标题与一句说明 */
+  .feature-band {
+    display: block;
+    padding: 44px 0;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .feature-item {
+    padding: 16px 18px;
+  }
+
+  .feature-item h3 { font-size: 16px; }
+  .feature-item p { font-size: 13px; }
+
+  /* FAQ：表格横向滚动，问答单列 */
+  .faq-section { padding: 44px 0 56px; }
+
+  .faq-subtitle {
+    font-size: 17px;
+    margin: 20px 0 10px;
+  }
+
+  .compare-table { font-size: 12.5px; }
+  .compare-table th,
+  .compare-table td { padding: 10px 12px; }
+
+  .faq-list { gap: 18px; }
+
+  .faq-item dt { font-size: 15.5px; }
+  .faq-item dd { font-size: 13.5px; line-height: 1.75; }
+
+  /* 尾部 CTA */
+  .closing-cta {
+    display: block;
+    padding: 40px 0 48px;
+  }
+
+  .closing-cta h2 {
+    font-size: clamp(24px, 7vw, 30px);
+    margin-bottom: 18px;
+  }
+
+  .closing-button { width: 100%; justify-content: center; }
+
+  .site-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 22px 0 30px;
+  }
+}
+
+/* 极窄屏进一步压缩 */
+@media (max-width: 400px) {
+  .hero-copy h1 { font-size: 28px; }
+  .start-card { padding: 16px 14px; }
+  .step-card { padding: 16px; }
+}
+
+/* 移动端：对比表改为卡片，避免横向滚动 */
+@media (max-width: 720px) {
+  .compare-table,
+  .compare-table tbody,
+  .compare-table tr,
+  .compare-table th,
+  .compare-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .compare-table thead { display: none; }
+
+  .compare-table tbody tr {
+    margin-bottom: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+  }
+
+  .compare-table tbody tr.is-highlight {
+    border-color: rgba(255, 106, 77, 0.45);
+    background: rgba(255, 106, 77, 0.06);
+  }
+
+  .compare-table tbody th {
+    padding: 0 0 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+    white-space: normal;
+  }
+
+  .compare-table td {
+    display: flex;
+    gap: 10px;
+    padding: 6px 0;
+    border: 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .compare-table td::before {
+    content: attr(data-label);
+    flex: 0 0 78px;
+    color: var(--muted-dim);
+    font-size: 12.5px;
+  }
+
+  .compare-table-wrap { overflow: visible; }
+  .compare-table { min-width: 0; }
+
+  /* 品牌名不换行 */
+  .brand-word strong {
+    white-space: nowrap;
+    font-size: 19px;
+  }
+
+  .brand-word small { letter-spacing: 0.12em; }
+  .brand { gap: 9px; }
+
+  /* 特性区的字母索引在手机上没意义 */
+  .feature-index { display: none; }
+  .feature-item { padding: 15px 17px; }
+}

@@ -25,4 +25,9 @@
     /** 邀请链接必须指向公网站点，即使当前运行在 App 内 */
     publicOrigin: isNative ? REMOTE_ORIGIN : location.origin,
   };
+
+  // 原生壳一律使用精简布局（即使平板或横屏），由 CSS 的 .is-native 驱动
+  if (isNative) {
+    document.documentElement.classList.add('is-native');
+  }
 })();

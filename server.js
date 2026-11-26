@@ -726,7 +726,25 @@ function seoRoutes(req, res, pathname) {
   return false;
 }
 
+// 移动端（Capacitor）从 https://localhost / capacitor://localhost 发起跨域请求，
+// 必须显式允许，否则 WebView 会拦掉响应，表现为「房间创建不了」。
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, HEAD, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Accept, X-Stats-Token',
+  'Access-Control-Max-Age': '86400',
+};
+
 const server = http.createServer(async (req, res) => {
+  for (const [name, value] of Object.entries(CORS_HEADERS)) res.setHeader(name, value);
+
+  // 预检请求直接放行，不进入路由
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   let pathname;
   try {
     pathname = new URL(req.url, 'http://localhost').pathname;
