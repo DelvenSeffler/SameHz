@@ -35,7 +35,6 @@
     '同步中': 'In sync',
     '自动': 'Auto',
     '手动': 'Manual',
-    '暂停（校准）': 'Paused',
     '尚未校准': 'Not yet',
     '等待同步': 'Waiting for sync',
     '进度已对齐': 'Progress aligned',
@@ -57,9 +56,6 @@
     '房间码已复制': 'Room code copied',
 
     /* ---------------- 首页 ---------------- */
-    '同频观影 · 隔着山海，一起看同一帧': 'SameHz · The same frame, wherever you are',
-    '同频观影，一间只属于两个人的同步放映室。各自打开本地片源，播放、暂停、进度实时同步，不压缩画质，不上传影片。':
-      'SameHz is a private sync cinema for two. Each of you loads the same film — play, pause and progress stay in sync, with no compression and no uploads.',
     '主导航': 'Main navigation',
     '产品特点': 'Highlights',
     '如何放映': 'How it works',
@@ -336,8 +332,6 @@
 
     /* ---------------- 在线链接 ---------------- */
     '载入在线视频': 'Load an online video',
-    '粘贴一个可以直接播放的视频链接，比如 MP4、WebM 或 HLS（m3u8）。两个人粘贴同一个链接，就能同步观看。':
-      'Paste a link that plays directly, such as MP4, WebM or HLS (m3u8). Paste the same link on both sides and you are in sync.',
     '粘贴视频网站链接，或直接粘贴视频文件链接。支持 YouTube、Bilibili、Vimeo 以及 MP4 / WebM / HLS 直链。':
       'Paste a video platform link, or a direct video file link. YouTube, Bilibili, Vimeo and MP4 / WebM / HLS are supported.',
     '视频链接': 'Video link',
@@ -345,7 +339,6 @@
     '例如：https://www.youtube.com/watch?v=…': 'e.g. https://www.youtube.com/watch?v=…',
     '支持 YouTube · Bilibili · Vimeo · 视频直链': 'YouTube · Bilibili · Vimeo · direct video links',
     'YouTube · 支持完整同步': 'YouTube · full sync',
-    'Bilibili · 仅嵌入，用「一起开始」对齐': 'Bilibili · embed only, align with “Start together”',
     'Vimeo · 仅嵌入，用「一起开始」对齐': 'Vimeo · embed only, align with “Start together”',
     '视频直链 · 支持完整同步': 'Direct link · full sync',
     '网页视频 · 服务器解析直链后完整同步': 'Web page · server finds the stream, then full sync',
@@ -357,25 +350,15 @@
     '该地址可能需要 Referer 校验，直接播放可能失败': 'This URL may require a Referer header — playback could fail',
     '没能解析这个网页里的视频': 'Could not parse a video from that page',
     '解析得太频繁了，请稍后再试': 'Too many lookups — please try again shortly',
-    'YouTube 支持完整同步；Bilibili 等平台只能嵌入播放，用「一起开始」倒计时对齐。':
-      'YouTube syncs fully. Bilibili and similar platforms can only be embedded — use the “Start together” countdown to line up.',
     '支持 MP4 / WebM / HLS 直链；网页地址（如 YouTube）暂不支持。':
       'Direct MP4 / WebM / HLS links only — page URLs such as YouTube are not supported.',
     '从设备选择文件': 'Choose a file from this device',
     '请输入视频链接': 'Please enter a video link',
     '链接格式不对，请粘贴 http 或 https 开头的地址': 'That link looks wrong — it should start with http or https',
-    '这是一个网页地址，不是视频文件。请粘贴 .mp4 / .webm / .m3u8 直链。':
-      'That is a web page, not a video file. Paste a direct .mp4 / .webm / .m3u8 link.',
     '没有识别出 YouTube 视频 ID，请粘贴完整的视频链接。': 'No YouTube video ID found — paste the full video link.',
-    'b23.tv 短链无法直接识别，请先在浏览器打开，再复制完整的 Bilibili 视频链接。':
-      'b23.tv short links cannot be parsed. Open it in a browser first, then copy the full Bilibili video link.',
-    '没有识别出 Bilibili 视频号，请粘贴含 BV 号或 av 号的视频链接。':
-      'No Bilibili video ID found — paste a link containing the BV or av number.',
     '没有识别出 Vimeo 视频 ID，请粘贴完整的视频链接。': 'No Vimeo video ID found — paste the full video link.',
     '暂不支持这个网站：它使用 DRM 加密，浏览器不允许第三方播放或解析。':
       'That site is not supported: it uses DRM encryption, which browsers do not allow third parties to play or parse.',
-    '暂不支持这个网站。可以粘贴 YouTube、Bilibili、Vimeo 视频链接，或 MP4 / WebM / M3U8 直链。':
-      'That site is not supported. Paste a YouTube, Bilibili or Vimeo link, or a direct MP4 / WebM / M3U8 link.',
     '正在连接 YouTube…': 'Connecting to YouTube…',
     'YouTube 片源已载入': 'YouTube source loaded',
     'YouTube 视频': 'YouTube video',    '无法载入这个 YouTube 视频：可能是网络限制、地区限制或被禁止嵌入。':
@@ -396,7 +379,6 @@
     '无法载入这个链接：可能是防盗链、跨域限制或格式不支持。':
       'Could not load that link — it may be hotlink-protected, cross-origin blocked, or unsupported.',
     'TA 正在使用在线片源，已为你同步载入': 'They are using an online source — loaded for you',
-    '载入 TA 的在线片源': "Load their online source",
     '在线播放': 'Online playback',
 
     /* ---------------- 模板（带变量） ---------------- */
@@ -416,7 +398,6 @@
     '{actor} 自动校准了 {seconds} 秒偏差': 'Auto-corrected {seconds}s of drift',
     '你载入了《{title}》': 'You loaded “{title}”',
     '你载入了在线片源《{title}》': 'You loaded the online source “{title}”',
-    'TA 载入了《{title}》': '{name} loaded “{title}”',
     '已对齐到 {time}': 'Aligned to {time}',
     '误差 {value}s': 'offset {value}s',
     '偏差 {value}s': 'drift {value}s',

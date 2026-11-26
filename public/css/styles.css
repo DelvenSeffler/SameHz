@@ -1912,8 +1912,85 @@ svg {
 /* 原生 App 一律走精简布局（即使平板/横屏） */
 .is-native [data-desktop-only] { display: none !important; }
 
+/* 极窄屏进一步压缩 */
+@media (max-width: 400px) {
+  .hero-copy h1 { font-size: 28px; }
+  .start-card { padding: 16px 14px; }
+  .step-card { padding: 16px; }
+}
+
+/* 移动端：对比表改为卡片，避免横向滚动 */
+
+
+/* 移动端首页：安全区与毛玻璃顶栏，贴近原生感 */
+
+.is-native .site-nav {
+  padding-top: calc(10px + max(env(safe-area-inset-top, 0px), 14px));
+}
+
+/* ==========================================================
+   移动端首页：只留功能
+   介绍、三步、特性、对比、问答在手机上全部不显示
+   ========================================================== */
+
+.is-native .how-section,
+.is-native .feature-band,
+.is-native .closing-cta,
+.is-native .faq-section {
+  display: none !important;
+}
+
+/* 移动端：表单已在下方，顶栏的锚点按钮不再需要 */
+
+
+/* ==========================================================
+   FAQ 折叠：桌面端保持展开且隐藏标题把手，移动端可点开
+   ========================================================== */
+
+.faq-disclosure { border: 0; }
+
+/* 桌面：去掉 summary 的默认三角与手型，视觉上等同普通标题 */
+.faq-summary {
+  display: block;
+  list-style: none;
+  cursor: default;
+  pointer-events: none;
+}
+
+.faq-summary::-webkit-details-marker { display: none; }
+.faq-summary::marker { content: ''; }
+
+.faq-chevron { display: none; }
+
+.faq-body { display: block; }
+
+/* 原生壳同样折叠 */
+.is-native .faq-section { display: block !important; }
+
+
+/* 移动端顶栏必须满宽：否则毛玻璃背景只覆盖内容区，左右露出底色 */
+
+.is-native .site-nav {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* 移动端与原生壳顶栏 logo：显式指定，不依赖 580 断点是否命中 */
+
+.is-native .brand-mark { width: 28px; height: 28px; }
+.is-native .brand { gap: 8px; }
+.is-native .brand-word strong { font-size: 17px; }
+.is-native .brand-word small { font-size: 9.5px; letter-spacing: 0.12em; }
+
+/* ==========================================================
+   移动端规则（由 8 个碎片块合并而来）
+   ========================================================== */
+
 @media (max-width: 720px) {
-  [data-desktop-only] { display: none !important; }
+[data-desktop-only] { display: none !important; }
 
   /* 顶部导航：只留品牌与语言切换 */
   .site-nav {
@@ -2054,18 +2131,8 @@ svg {
     gap: 6px;
     padding: 22px 0 30px;
   }
-}
 
-/* 极窄屏进一步压缩 */
-@media (max-width: 400px) {
-  .hero-copy h1 { font-size: 28px; }
-  .start-card { padding: 16px 14px; }
-  .step-card { padding: 16px; }
-}
-
-/* 移动端：对比表改为卡片，避免横向滚动 */
-@media (max-width: 720px) {
-  .compare-table,
+.compare-table,
   .compare-table tbody,
   .compare-table tr,
   .compare-table th,
@@ -2128,11 +2195,8 @@ svg {
   /* 特性区的字母索引在手机上没意义 */
   .feature-index { display: none; }
   .feature-item { padding: 15px 17px; }
-}
 
-/* 移动端首页：安全区与毛玻璃顶栏，贴近原生感 */
-@media (max-width: 720px) {
-  .site-nav {
+.site-nav {
     position: sticky;
     top: 0;
     z-index: 40;
@@ -2146,19 +2210,8 @@ svg {
   .site-footer {
     padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   }
-}
 
-.is-native .site-nav {
-  padding-top: calc(10px + max(env(safe-area-inset-top, 0px), 14px));
-}
-
-/* ==========================================================
-   移动端首页：只留功能
-   介绍、三步、特性、对比、问答在手机上全部不显示
-   ========================================================== */
-
-@media (max-width: 720px) {
-  .how-section,
+.how-section,
   .feature-band,
   .closing-cta,
   .faq-section {
@@ -2193,44 +2246,11 @@ svg {
     padding: 18px 0 calc(22px + env(safe-area-inset-bottom, 0px));
     font-size: 11.5px;
   }
-}
 
-.is-native .how-section,
-.is-native .feature-band,
-.is-native .closing-cta,
-.is-native .faq-section {
-  display: none !important;
-}
-
-/* 移动端：表单已在下方，顶栏的锚点按钮不再需要 */
-@media (max-width: 720px) {
-  .nav-cta { display: none; }
+.nav-cta { display: none; }
   .nav-actions { margin-left: auto; }
-}
 
-/* ==========================================================
-   FAQ 折叠：桌面端保持展开且隐藏标题把手，移动端可点开
-   ========================================================== */
-
-.faq-disclosure { border: 0; }
-
-/* 桌面：去掉 summary 的默认三角与手型，视觉上等同普通标题 */
-.faq-summary {
-  display: block;
-  list-style: none;
-  cursor: default;
-  pointer-events: none;
-}
-
-.faq-summary::-webkit-details-marker { display: none; }
-.faq-summary::marker { content: ''; }
-
-.faq-chevron { display: none; }
-
-.faq-body { display: block; }
-
-@media (max-width: 720px) {
-  .faq-section {
+.faq-section {
     display: block !important;
     padding: 26px 0 34px;
     border-top: 1px solid var(--line);
@@ -2273,40 +2293,17 @@ svg {
   }
 
   .faq-summary:active { background: rgba(255, 255, 255, 0.06); }
-}
 
-/* 原生壳同样折叠 */
-.is-native .faq-section { display: block !important; }
-
-
-/* 移动端顶栏必须满宽：否则毛玻璃背景只覆盖内容区，左右露出底色 */
-@media (max-width: 720px) {
-  .site-nav {
+.site-nav {
     width: 100%;
     max-width: none;
     margin: 0;
     padding-left: 16px;
     padding-right: 16px;
   }
-}
 
-.is-native .site-nav {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  padding-left: 16px;
-  padding-right: 16px;
+.brand-mark { width: 28px; height: 28px; }
+  .brand { gap: 8px; }
+  .brand-word strong { font-size: 17px; }
+  .brand-word small { font-size: 9.5px; letter-spacing: 0.12em; }
 }
-
-/* 移动端与原生壳顶栏 logo：显式指定，不依赖 580 断点是否命中 */
-@media (max-width: 720px) {
-  .brand-mark { width: 32px; height: 32px; }
-  .brand { gap: 9px; }
-  .brand-word strong { font-size: 18px; }
-  .brand-word small { font-size: 10px; letter-spacing: 0.12em; }
-}
-
-.is-native .brand-mark { width: 32px; height: 32px; }
-.is-native .brand { gap: 9px; }
-.is-native .brand-word strong { font-size: 18px; }
-.is-native .brand-word small { font-size: 10px; letter-spacing: 0.12em; }

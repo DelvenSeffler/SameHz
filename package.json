@@ -21,7 +21,9 @@
     "cap:ios": "cap open ios",
     "cap:build:android": "cap sync android && cd android && gradlew.bat assembleDebug",
     "gen:app-icons": "node tools/gen-app-icons.js && cap sync",
-    "icons": "node tools/gen-app-icons.js && capacitor-assets generate --iconBackgroundColor \"#0b0a09\" --iconBackgroundColorDark \"#0b0a09\" --splashBackgroundColor \"#0b0a09\" --splashBackgroundColorDark \"#0b0a09\" && node tools/patch-adaptive-icon.js"
+    "icons": "node tools/gen-app-icons.js && capacitor-assets generate --iconBackgroundColor \"#0b0a09\" --iconBackgroundColorDark \"#0b0a09\" --splashBackgroundColor \"#0b0a09\" --splashBackgroundColorDark \"#0b0a09\" && node tools/patch-adaptive-icon.js",
+    "lint:dead": "node tools/find-dead-code.js && node tools/find-unused-css.js && node tools/find-unused-i18n.js",
+    "css:merge": "node tools/merge-media-queries.js"
   },
   "engines": {
     "node": ">=18"

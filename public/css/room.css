@@ -2895,8 +2895,305 @@ body.modal-open {
   }
 }
 
+
+
+@media (max-width: 440px) {
+  .room-meta {
+    gap: 5px;
+  }
+
+  .room-code-chip {
+    font-size: 11px;
+    letter-spacing: 0.13em;
+  }
+
+  .room-code-chip .icon {
+    width: 11px;
+    height: 11px;
+  }
+
+  .room-nav-actions {
+    gap: 5px;
+  }
+
+  .nav-ghost-button {
+    width: 31px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .stage-frame {
+    aspect-ratio: 4 / 5;
+  }
+
+  .stage-frame.has-video {
+    aspect-ratio: 16 / 9;
+  }
+
+  .empty-inner h1 {
+    font-size: 27px;
+  }
+
+  .empty-copy {
+    font-size: 12px;
+  }
+
+  .screen-sync-pill {
+    font-size: 10.5px;
+  }
+
+  .screen-action {
+    font-size: 10.5px;
+  }
+
+  .drift-readout {
+    display: none;
+  }
+
+  .control-time:last-child {
+    display: none;
+  }
+
+  .manual-sync-copy strong {
+    font-size: 12px;
+  }
+
+  .invite-code {
+    font-size: 31px;
+  }
+
+  .entry-room-code strong {
+    font-size: 13px;
+  }
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes empty-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes panel-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes reel-turn {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbit-run {
+  0% { left: 0; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { left: calc(100% - 5px); opacity: 0; }
+}
+
+@keyframes soft-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes activity-in {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 可读性：小字加粗、收敛字距 ---------- */
+
+.empty-copy,
+.panel-hint,
+.sync-hint,
+.dialog-copy,
+.entry-copy,
+.film-subline,
+.participant-status,
+.participant-name,
+.sync-data-rows span,
+.switch-row span:first-child,
+.switch-row small,
+.drag-hint,
+.privacy-mini,
+.dialog-footnote,
+.help-steps p,
+.help-callout p,
+.activity-item,
+.entry-back,
+.invite-link-field > span,
+.entry-field span,
+.stage-loading small,
+.gesture-card small,
+.manual-sync-copy small,
+.match-badge-copy small,
+.orbit-center small,
+.drop-overlay > span:last-child,
+.source-platform,
+.room-label,
+.room-date,
+.seat-count,
+.panel-index,
+.dialog-kicker,
+.entry-kicker,
+.stage-kicker,
+.live-chip,
+.auto-chip,
+.participant-tag,
+.activity-item time,
+.entry-note,
+.entry-error {
+  font-weight: 500;
+}
+
+.stage-kicker,
+.dialog-kicker,
+.entry-kicker,
+.room-date,
+.room-brand .brand-word small {
+  letter-spacing: 0.14em;
+}
+
+/* ---------- 邀请海报按钮 ---------- */
+
+.dialog-poster-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 42px;
+  margin-top: 9px;
+  border: 1px dashed rgba(255, 138, 107, 0.45);
+  border-radius: 7px;
+  background: rgba(255, 138, 107, 0.06);
+  color: var(--ink-soft);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.dialog-poster-button .icon {
+  width: 15px;
+  height: 15px;
+  color: var(--gold);
+}
+
+.dialog-poster-button:hover {
+  color: var(--ink);
+  border-color: rgba(255, 138, 107, 0.75);
+  background: rgba(255, 138, 107, 0.12);
+}
+
+/* ==========================================================
+   移动端 / 原生 App 精简布局
+   目标：播放器优先，一屏内能选片、能一键同步
+   ========================================================== */
+
+.is-native [data-desktop-only] { display: none !important; }
+
+@media (max-width: 400px) {
+  .empty-inner h1 { font-size: 23px; }
+  .invite-code { font-size: 22px; }
+  .play-control { width: 46px; height: 46px; }
+  .control-button { width: 38px; height: 38px; }
+}
+
+/* 移动端修正：顶栏不重叠、播放器高度自适应内容 */
+
+
+/* 移动端：空状态所需高度与内边距 */
+
+
+/* 移动端：隐藏只起装饰作用的英文跑马灯，避免与说明文字重叠 */
+
+
+/* ==========================================================
+   移动端 App 化改造
+   安全区 + 毛玻璃顶栏 + 底部固定操作栏
+   ========================================================== */
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+
+
+/* 安全区兜底：即使 env() 返回 0 也留出呼吸空间 */
+
+.is-native .room-nav {
+  padding-top: calc(10px + max(var(--safe-top, 0px), 14px));
+}
+
+
+
+/* 移动端：去掉纯装饰的小字，只留信息 */
+
+.is-native .stage-kicker,
+.is-native .panel-index,
+.is-native .film-overline {
+  display: none !important;
+}
+
+/* ==========================================================
+   移动端比例与呼吸感
+   图标放大、间距放宽、播放器贴合手机屏比
+   ========================================================== */
+
+
+
+/* 移动端布局宽度修正：桌面版留了 64px 边距，手机上不该浪费 */
+
+.is-native .room-layout {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+/* 移动端顶栏：连接状态在播放器上方的状态条已有显示，这里不再重复 */
+
+.is-native .room-nav .connection-pill { display: none; }
+
+/* 移动端顶栏满宽，避免左右露出底色 */
+
+.is-native .room-nav {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+/* 房间页顶栏 logo 同样显式指定 */
+
+.is-native .room-brand .brand-mark { width: 28px; height: 28px; }
+.is-native .room-brand .brand-word strong { font-size: 16px; }
+
+/* 帮助弹窗里的版本号 */
+.app-version {
+  margin: 12px 0 0;
+  color: var(--muted-dim);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+/* ==========================================================
+   移动端规则（由 13 个碎片块合并而来）
+   ========================================================== */
+
 @media (max-width: 720px) {
-  .room-nav,
+.room-nav,
   .room-layout,
   .room-footer {
     width: calc(100% - 26px);
@@ -3138,215 +3435,8 @@ body.modal-open {
   .modal-layer {
     padding: 14px;
   }
-}
 
-@media (max-width: 440px) {
-  .room-meta {
-    gap: 5px;
-  }
-
-  .room-code-chip {
-    font-size: 11px;
-    letter-spacing: 0.13em;
-  }
-
-  .room-code-chip .icon {
-    width: 11px;
-    height: 11px;
-  }
-
-  .room-nav-actions {
-    gap: 5px;
-  }
-
-  .nav-ghost-button {
-    width: 31px;
-    padding: 0;
-    justify-content: center;
-  }
-
-  .stage-frame {
-    aspect-ratio: 4 / 5;
-  }
-
-  .stage-frame.has-video {
-    aspect-ratio: 16 / 9;
-  }
-
-  .empty-inner h1 {
-    font-size: 27px;
-  }
-
-  .empty-copy {
-    font-size: 12px;
-  }
-
-  .screen-sync-pill {
-    font-size: 10.5px;
-  }
-
-  .screen-action {
-    font-size: 10.5px;
-  }
-
-  .drift-readout {
-    display: none;
-  }
-
-  .control-time:last-child {
-    display: none;
-  }
-
-  .manual-sync-copy strong {
-    font-size: 12px;
-  }
-
-  .invite-code {
-    font-size: 31px;
-  }
-
-  .entry-room-code strong {
-    font-size: 13px;
-  }
-}
-
-/* ---------- Keyframes ---------- */
-
-@keyframes empty-in {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes panel-up {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes modal-in {
-  from { opacity: 0; transform: translateY(18px) scale(0.985); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes reel-turn {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes orbit-run {
-  0% { left: 0; opacity: 0; }
-  15% { opacity: 1; }
-  85% { opacity: 1; }
-  100% { left: calc(100% - 5px); opacity: 0; }
-}
-
-@keyframes soft-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
-}
-
-@keyframes activity-in {
-  from { opacity: 0; transform: translateY(-3px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ---------- 可读性：小字加粗、收敛字距 ---------- */
-
-.empty-copy,
-.panel-hint,
-.sync-hint,
-.dialog-copy,
-.entry-copy,
-.film-subline,
-.participant-status,
-.participant-name,
-.sync-data-rows span,
-.switch-row span:first-child,
-.switch-row small,
-.drag-hint,
-.privacy-mini,
-.dialog-footnote,
-.help-steps p,
-.help-callout p,
-.activity-item,
-.entry-back,
-.invite-link-field > span,
-.entry-field span,
-.stage-loading small,
-.gesture-card small,
-.manual-sync-copy small,
-.match-badge-copy small,
-.orbit-center small,
-.drop-overlay > span:last-child,
-.source-platform,
-.room-label,
-.room-date,
-.seat-count,
-.panel-index,
-.dialog-kicker,
-.entry-kicker,
-.stage-kicker,
-.live-chip,
-.auto-chip,
-.participant-tag,
-.activity-item time,
-.entry-note,
-.entry-error {
-  font-weight: 500;
-}
-
-.stage-kicker,
-.dialog-kicker,
-.entry-kicker,
-.room-date,
-.room-brand .brand-word small {
-  letter-spacing: 0.14em;
-}
-
-/* ---------- 邀请海报按钮 ---------- */
-
-.dialog-poster-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  height: 42px;
-  margin-top: 9px;
-  border: 1px dashed rgba(255, 138, 107, 0.45);
-  border-radius: 7px;
-  background: rgba(255, 138, 107, 0.06);
-  color: var(--ink-soft);
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
-}
-
-.dialog-poster-button .icon {
-  width: 15px;
-  height: 15px;
-  color: var(--gold);
-}
-
-.dialog-poster-button:hover {
-  color: var(--ink);
-  border-color: rgba(255, 138, 107, 0.75);
-  background: rgba(255, 138, 107, 0.12);
-}
-
-/* ==========================================================
-   移动端 / 原生 App 精简布局
-   目标：播放器优先，一屏内能选片、能一键同步
-   ========================================================== */
-
-.is-native [data-desktop-only] { display: none !important; }
-
-@media (max-width: 720px) {
-  [data-desktop-only] { display: none !important; }
+[data-desktop-only] { display: none !important; }
 
   .room-page { padding-bottom: env(safe-area-inset-bottom, 0); }
 
@@ -3558,18 +3648,8 @@ body.modal-open {
   }
 
   .countdown-card strong { font-size: 64px; }
-}
 
-@media (max-width: 400px) {
-  .empty-inner h1 { font-size: 23px; }
-  .invite-code { font-size: 22px; }
-  .play-control { width: 46px; height: 46px; }
-  .control-button { width: 38px; height: 38px; }
-}
-
-/* 移动端修正：顶栏不重叠、播放器高度自适应内容 */
-@media (max-width: 720px) {
-  /* 房间码在下方侧栏已大号展示，顶栏不再重复，避免挤压重叠 */
+/* 房间码在下方侧栏已大号展示，顶栏不再重复，避免挤压重叠 */
   .room-code-chip { display: none; }
 
   .room-meta { display: none; }
@@ -3635,11 +3715,8 @@ body.modal-open {
 
   /* 加载态也跟随最小高度 */
   .stage-loading { min-height: 340px; }
-}
 
-/* 移动端：空状态所需高度与内边距 */
-@media (max-width: 720px) {
-  .stage-frame {
+.stage-frame {
     min-height: 440px;
   }
 
@@ -3666,25 +3743,10 @@ body.modal-open {
     transform: scale(0.72);
     margin-bottom: 4px;
   }
-}
 
-/* 移动端：隐藏只起装饰作用的英文跑马灯，避免与说明文字重叠 */
-@media (max-width: 720px) {
-  .empty-state::after { display: none; }
-}
+.empty-state::after { display: none; }
 
-/* ==========================================================
-   移动端 App 化改造
-   安全区 + 毛玻璃顶栏 + 底部固定操作栏
-   ========================================================== */
-
-:root {
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-@media (max-width: 720px) {
-  .room-page {
+.room-page {
     padding-bottom: calc(20px + var(--safe-bottom));
   }
 
@@ -3739,27 +3801,11 @@ body.modal-open {
     padding: 14px 16px 18px;
   }
 
-}
-
-
-/* 安全区兜底：即使 env() 返回 0 也留出呼吸空间 */
-@media (max-width: 720px) {
-  .room-nav {
+.room-nav {
     padding-top: calc(10px + max(var(--safe-top, 0px), 10px));
   }
 
-
-}
-
-.is-native .room-nav {
-  padding-top: calc(10px + max(var(--safe-top, 0px), 14px));
-}
-
-
-
-/* 移动端：去掉纯装饰的小字，只留信息 */
-@media (max-width: 720px) {
-  .stage-kicker,
+.stage-kicker,
   .panel-index,
   .film-overline {
     display: none !important;
@@ -3798,22 +3844,8 @@ body.modal-open {
     font-size: 11px;
     opacity: 0.75;
   }
-}
 
-.is-native .stage-kicker,
-.is-native .panel-index,
-.is-native .film-overline {
-  display: none !important;
-}
-
-/* ==========================================================
-   移动端比例与呼吸感
-   图标放大、间距放宽、播放器贴合手机屏比
-   ========================================================== */
-
-@media (max-width: 720px) {
-
-  /* 播放器：贴合手机竖屏比例，留白更从容 */
+/* 播放器：贴合手机竖屏比例，留白更从容 */
   .stage-frame {
     border-radius: 22px 22px 0 0;
   }
@@ -3872,12 +3904,7 @@ body.modal-open {
 
   /* 弹窗内图标与按钮 */
 
-}
-
-
-/* 移动端布局宽度修正：桌面版留了 64px 边距，手机上不该浪费 */
-@media (max-width: 720px) {
-  .room-layout {
+.room-layout {
     width: 100%;
     max-width: none;
     margin: 0;
@@ -3899,51 +3926,15 @@ body.modal-open {
   .stage-frame.has-video {
     aspect-ratio: 16 / 9;
   }
-}
 
-.is-native .room-layout {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-}
+.room-nav .connection-pill { display: none; }
 
-/* 移动端顶栏：连接状态在播放器上方的状态条已有显示，这里不再重复 */
-@media (max-width: 720px) {
-  .room-nav .connection-pill { display: none; }
-}
-
-.is-native .room-nav .connection-pill { display: none; }
-
-/* 移动端顶栏满宽，避免左右露出底色 */
-@media (max-width: 720px) {
-  .room-nav {
+.room-nav {
     width: 100%;
     max-width: none;
     margin: 0;
   }
-}
 
-.is-native .room-nav {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-}
-
-/* 房间页顶栏 logo 同样显式指定 */
-@media (max-width: 720px) {
-  .room-brand .brand-mark { width: 28px; height: 28px; }
+.room-brand .brand-mark { width: 28px; height: 28px; }
   .room-brand .brand-word strong { font-size: 16px; }
-}
-
-.is-native .room-brand .brand-mark { width: 28px; height: 28px; }
-.is-native .room-brand .brand-word strong { font-size: 16px; }
-
-/* 帮助弹窗里的版本号 */
-.app-version {
-  margin: 12px 0 0;
-  color: var(--muted-dim);
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-align: center;
 }
