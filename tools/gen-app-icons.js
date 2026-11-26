@@ -48,18 +48,18 @@ const DEFS = `
  * 图标主体。scale 用于把内容收进 Android 自适应图标安全区。
  */
 function mark({ scale = 1, withGlow = true } = {}) {
-  const tri = 106;         // 播放键高度
+  const tri = 98;          // 播放键高度
   const half = tri / 2;
   const w = tri * 0.84;
   const x = C - w * 0.36;
   const y = C - half;
   return `
   <g transform="translate(${C} ${C}) scale(${scale}) translate(${-C} ${-C})">
-    ${withGlow ? `<circle cx="${C}" cy="${C}" r="162" fill="url(#warm)"/>` : ''}
-    <circle cx="${C}" cy="${C}" r="200" fill="none" stroke="url(#ringOuter)" stroke-width="8"/>
-    <circle cx="${C}" cy="${C}" r="164" fill="none" stroke="#ff8f72" stroke-opacity=".42" stroke-width="7"
+    ${withGlow ? `<circle cx="${C}" cy="${C}" r="149" fill="url(#warm)"/>` : ''}
+    <circle cx="${C}" cy="${C}" r="184" fill="none" stroke="url(#ringOuter)" stroke-width="8"/>
+    <circle cx="${C}" cy="${C}" r="151" fill="none" stroke="#ff8f72" stroke-opacity=".42" stroke-width="7"
             stroke-linecap="round" stroke-dasharray="3 14"/>
-    <circle cx="${C}" cy="${C}" r="118" fill="url(#disc)"/>
+    <circle cx="${C}" cy="${C}" r="109" fill="url(#disc)"/>
     <path d="M${x} ${y} L${x + w} ${C} L${x} ${y + tri} Z"
           fill="#fffaf6" stroke="#fffaf6" stroke-width="11" stroke-linejoin="round"/>
   </g>`;
@@ -107,7 +107,7 @@ const splashSvg = () => `
   // 通用图标：满幅
   await shoot(iconSvg({ background: true }), 1024, 'icon.png');
   // Android 自适应前景：内容收进中间 66%，透明底
-  await shoot(iconSvg({ background: false, scale: 0.85 }), 1024, 'icon-foreground.png', true);
+  await shoot(iconSvg({ background: false, scale: 0.92 }), 1024, 'icon-foreground.png', true);
   // Android 自适应背景
   await shoot(`<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
       ${DEFS}<rect width="512" height="512" fill="url(#bg)"/></svg>`, 1024, 'icon-background.png');

@@ -3928,3 +3928,12 @@ body.modal-open {
   max-width: none;
   margin: 0;
 }
+
+/* 房间页顶栏 logo 同样显式指定 */
+@media (max-width: 720px) {
+  .room-brand .brand-mark { width: 28px; height: 28px; }
+  .room-brand .brand-word strong { font-size: 16px; }
+}
+
+.is-native .room-brand .brand-mark { width: 28px; height: 28px; }
+.is-native .room-brand .brand-word strong { font-size: 16px; }

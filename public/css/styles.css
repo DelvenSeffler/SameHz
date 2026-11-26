@@ -2297,3 +2297,16 @@ svg {
   padding-left: 16px;
   padding-right: 16px;
 }
+
+/* 移动端与原生壳顶栏 logo：显式指定，不依赖 580 断点是否命中 */
+@media (max-width: 720px) {
+  .brand-mark { width: 32px; height: 32px; }
+  .brand { gap: 9px; }
+  .brand-word strong { font-size: 18px; }
+  .brand-word small { font-size: 10px; letter-spacing: 0.12em; }
+}
+
+.is-native .brand-mark { width: 32px; height: 32px; }
+.is-native .brand { gap: 9px; }
+.is-native .brand-word strong { font-size: 18px; }
+.is-native .brand-word small { font-size: 10px; letter-spacing: 0.12em; }
