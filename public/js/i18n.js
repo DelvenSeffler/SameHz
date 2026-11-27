@@ -61,6 +61,7 @@
     '如何放映': 'How it works',
     '同步原理': 'How sync works',
     '开始使用': 'Get started',
+    'Android 版': 'Android app',
     '进入放映室': 'Enter the room',
     '隔着山海，': 'Across any distance,',
     '一起看同一帧。': 'on the very same frame.',
