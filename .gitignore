@@ -38,3 +38,7 @@ ios/App/build/
 
 # 构建产物
 dist/
+
+# 网站提供的下载包需要进仓库（上面忽略了构建产物）
+!public/download/
+!public/download/*.apk

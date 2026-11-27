@@ -2307,3 +2307,53 @@ svg {
   .brand-word strong { font-size: 17px; }
   .brand-word small { font-size: 9.5px; letter-spacing: 0.12em; }
 }
+
+/* 页脚：移动端下载入口，低调不抢主 CTA */
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-left: auto;
+}
+
+.footer-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  color: var(--muted);
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  transition: color 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+}
+
+.footer-download svg {
+  width: 13px;
+  height: 13px;
+}
+
+.footer-download:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* App 内不显示下载入口 */
+.is-native .footer-download { display: none; }
+
+@media (max-width: 720px) {
+  .footer-links {
+    margin-left: 0;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .footer-download {
+    min-height: 36px;
+    padding: 0 14px;
+    font-size: 12.5px;
+  }
+}
