@@ -171,4 +171,21 @@
       || Boolean(window.SAMEHZ && window.SAMEHZ.native);
     if (compact) disclosure.open = false;
   }
+
+  /*
+   * 移动端 App 下载入口
+   * 只在手机浏览器显示：iOS 没有做客户端，App 内也无需下载，桌面已有顶栏入口。
+   */
+  const appCta = document.getElementById('app-download-cta');
+  if (appCta) {
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPad|iPhone|iPod/i.test(ua)
+      // iPadOS 13+ 伪装成 Mac，用触点数区分
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/i.test(ua);
+    const isPhone = window.matchMedia('(max-width: 720px)').matches;
+    const inApp = Boolean(window.SAMEHZ && window.SAMEHZ.native);
+
+    if (!isIOS && !inApp && isPhone && isAndroid) appCta.classList.remove('is-hidden');
+  }
 })();
